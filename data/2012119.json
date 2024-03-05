@@ -1,0 +1,1 @@
+{"id":2012119,"mondai":"ネットワーク管理プロトコルであるSNMPバージョン1のメッセージタイプのうち，事象の発生をエージェント自身が自発的にマネージャに知らせるために使用するものはどれか。","sentaku":["get-request","get-response","set-request","trap"],"answer":3,"bunrui":5}

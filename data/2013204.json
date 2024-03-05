@@ -1,0 +1,1 @@
+{"id":2013204,"mondai":"無線LANにおけるWPA2の特徴はどれか。","sentaku":["AHとESPの機能によって認証と暗号化を実現する。","暗号化アルゴリズムにAESを採用したCCMP(Counter-mode with CBC-MAC Protocol)を使用する。","端末とアクセスポイントの間で通信を行う際に，SSL Handshake Protocolを使用して，お互いが正当な相手かどうかを認証する。","利用者が設定する秘密鍵と，製品で生成するIV(Initialization Vector)とを連結した数字を基に，データをフレームごとにRC4で暗号化する。"],"answer":1,"bunrui":4}

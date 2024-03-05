@@ -1,0 +1,1 @@
+{"id":2010221,"mondai":"和両立である表R(<u>ID<\/u>，NAME)，S(<u>NO<\/u>，NAMAE)がある。差集合R－Sを求めるSELECT文とするために，aに入れるべき適切な字句はどれか。ここで，下線部は主キーを表す。また，NAMEとNAMAEはNULL不可とする。<div class=\"img_margin\"><img data-image-index=\"0\"><\/div>","sentaku":["EXISTS","NOT EXISTS","NOT IN","R.ID NOT IN"],"answer":1,"bunrui":6}

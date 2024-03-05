@@ -1,0 +1,1 @@
+{"id":2023204,"mondai":"XMLデジタル署名の特徴として，適切なものはどれか。","sentaku":["XML文書中の任意のエレメントに対してデタッチ署名(Detached Signature)を作成し，同じXML文書に含めることができる。","エンベローピング署名(Enveloping Signature)では一つの署名対象に複数の署名を付与する。","署名の書式として，CMS(Cryptographic Message Syntax)を用いる。","デジタル署名では，署名対象と署名アルゴリズムをASN.1によって記述する。"],"answer":0,"bunrui":0}

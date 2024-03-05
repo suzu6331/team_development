@@ -1,0 +1,1 @@
+{"id":2009116,"mondai":"RDBMSの表へのアクセスにおいて，特定の利用者だけにアクセス権を与える方法として，適切なものはどれか。","sentaku":["CONNECT文で接続を許可する。","CREATE ASSERTION文で表明して制限する。","CREATE TABLE文の参照制約で制限する。","GRANT文で利用を許可する。"],"answer":3,"bunrui":6}

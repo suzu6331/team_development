@@ -1,0 +1,1 @@
+{"id":2022104,"mondai":"パスワードに使用できる文字の種類の数をM，パスワードの文字数をnとするとき，設定できるパスワードの理論的な総数を求める数式はどれか。","sentaku":["M<sup>n<\/sup>","<span class=\"frac\"><span>M！<\/span>(M－n)！<\/span>","<span class=\"frac\"><span>M！<\/span>n！(M－n)！<\/span>","<span class=\"frac\"><span>(M＋n－1)！<\/span>n！(M－n)！<\/span>"],"answer":0,"bunrui":0}

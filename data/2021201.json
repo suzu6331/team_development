@@ -1,0 +1,1 @@
+{"id":2021201,"mondai":"AIによる画像認識において，認識させる画像の中に人間には知覚できないノイズや微小な変化を含めることによってAIアルゴリズムの特性を悪用し，判定結果を誤らせる攻撃はどれか。","sentaku":["Adaptively Chosen Message攻撃","Adversarial Examples攻撃","Distributed Reflection Denial of Service攻撃","Model Inversion攻撃"],"answer":1,"bunrui":0}

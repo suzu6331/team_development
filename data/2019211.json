@@ -1,0 +1,1 @@
+{"id":2019211,"mondai":"CookieにSecure属性を設定しなかったときと比較した，設定したときの動作として，適切なものはどれか。","sentaku":["Cookieに指定された有効期間を過ぎると，Cookieが無効化される。","JavaScriptによるCookieの読出しが禁止される。","URL内のスキームがhttpsのときだけ，WebブラウザからCookieが送出される。","WebブラウザがアクセスするURL内のパスとCookieによって指定されたパスのプレフィックスが一致するときだけ，WebブラウザからCookieが送出される。"],"answer":2,"bunrui":4}

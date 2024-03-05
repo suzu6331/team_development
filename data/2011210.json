@@ -1,0 +1,1 @@
+{"id":2011210,"mondai":"表に示すテーブルX，Yへのアクセス要件に関して，JIS Q 27001:2006(ISO\/IEC 27001:2005)が示す\"完全性\"の観点からセキュリティを脅かすおそれのあるアクセス権付与はどれか。<div class=\"img_margin\"><img data-image-index=\"0\"><\/div>","sentaku":["GRANT INSERT ON Y TO A","GRANT INSERT ON Y TO B","GRANT SELECT ON X TO A","GRANT SELECT ON X TO B"],"answer":0,"bunrui":1}

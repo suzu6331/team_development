@@ -1,0 +1,1 @@
+{"id":2010102,"mondai":"XMLデジタル署名の特徴はどれか。","sentaku":["XML文書中の，指定したエレメントに対して署名することができる。","エンベローピング署名(Enveloping Signature)では一つの署名対象に必ず複数の署名を付ける。","署名形式として，CMS(Cryptographic Message Syntax)を用いる。","署名対象と署名アルゴリズムをASN.1によって記述する。"],"answer":0,"bunrui":0}

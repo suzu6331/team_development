@@ -1,0 +1,1 @@
+{"id":2019120,"mondai":"ネットワーク管理プロトコルであるSNMPv3で使われるPDUのうち，事象の発生をエージェントが自発的にマネージャに知らせるために使用するものはどれか。ここで，エージェントとはエージェント相当のエンティティ，マネージャとはマネージャ相当のエンティティを指す。","sentaku":["GetRequest-PDU","Response-PDU","SetRequest-PDU","SNMPv2-Trap-PDU"],"answer":3,"bunrui":5}

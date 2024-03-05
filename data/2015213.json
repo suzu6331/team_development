@@ -1,0 +1,1 @@
+{"id":2015213,"mondai":"WebサーバがHTTPS通信の応答でcookieにSecure属性を設定したときのブラウザの処理はどれか。","sentaku":["ブラウザは，cookieの\"Secure=\"に続いて指定された時間を参照し，指定された時間を過ぎている場合にそのcookieを削除する。","ブラウザは，cookieの\"Secure=\"に続いて指定されたホスト名を参照し，指定されたホストにそのcookieを送信する。","ブラウザは，cookieの\"Secure\"を参照し，HTTPS通信時だけそのcookieを送信する。","ブラウザは，cookieの\"Secure\"を参照し，ブラウザの終了時にそのcookieを削除する。"],"answer":2,"bunrui":4}

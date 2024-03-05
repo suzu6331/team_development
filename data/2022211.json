@@ -1,0 +1,1 @@
+{"id":2022211,"mondai":"クリックジャッキング攻撃に有効な対策はどれか。","sentaku":["cookieに，HttpOnly属性を設定する。","cookieに，Secure属性を設定する。","HTTPレスポンスヘッダーに，Strict-Transport-Securityを設定する。","HTTPレスポンスヘッダーに，X-Frame-Optionsを設定する。"],"answer":3,"bunrui":4}
