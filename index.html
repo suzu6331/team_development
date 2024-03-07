@@ -1,0 +1,110 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+<meta charset="utf-8">
+<title>SC AM2</title>
+<style>
+/*
+	layout
+
+	body
+		header
+		main
+			#create
+			#index
+				#control
+				#catalog
+			#question
+			#transaction
+
+https://kudakurage.com/ligature_symbols/
+*/
+
+
+@font-face {
+	font-family: 'LigatureSymbols'; /* フォントファミリーの定義 */
+	src: url('LigatureSymbols-2.11.woff') format('woff'); /* フォントファイルの指定 */
+	font-weight: normal; /* フォントの太さ */
+	font-style: normal; /* フォントスタイル */
+}
+
+/* リガチャシンボルフォントの利用設定 */
+.lsf, .lsf-icon::before {
+	font-family: 'LigatureSymbols'; 
+	-webkit-text-rendering: optimizeLegibility;
+	-moz-text-rendering: optimizeLegibility;
+	-ms-text-rendering: optimizeLegibility;
+	-o-text-rendering: optimizeLegibility;
+	text-rendering: optimizeLegibility;
+	-webkit-font-smoothing: antialiased;
+	-moz-font-smoothing: antialiased;
+	-ms-font-smoothing: antialiased;
+	-o-font-smoothing: antialiased;
+	font-smoothing: antialiased;
+}
+
+/* アイコン用クラス設定 */
+.lsf-icon::before {
+	content:attr(data-icon); 
+	margin-right:0.3em;
+	font-size:130%; 
+	letter-spacing: 0px;
+}
+
+/* body要素のスタイリング */
+body {
+	margin: 0px;
+	padding: 0px; 
+	background-color: #fff; 
+}
+
+/* header要素のスタイリング */
+header {
+	color: #fff; 
+	background-color: #444;
+	margin: 0em; 
+	padding-top: 0.25em; 
+	position: sticky; 
+	top: 0px; 
+	opacity: 95%; 
+}
+/* ドリルモード時のヘッダースタイル */
+header[data-mode="drill"] {
+	background-color: #484;
+}
+/* 試験モード時のヘッダースタイル */
+header[data-mode="exam"] {
+	background-color: #c44;
+}
+
+/* ヘッダーの初期テキストスタイリング */
+header::before {
+	display: inline-block;
+	font-size: 1.2em; 
+	font-weight: bold;
+	content: "SC AM2 Drill";
+	margin-left: 0.25em;
+	padding: 0.125em;
+}
+/* モード切替スパン要素の表示制御 */
+header > span[data-mode] {
+	display: none; /* デフォルトで非表示 */
+}
+/* アクティブモードのスパン要素を表示 */
+header[data-mode="null"] > span[data-mode="null"],
+header[data-mode="drill"] > span[data-mode="drill"],
+header[data-mode="exam"] > span[data-mode="exam"] {
+	display: inline-block; 
+}
+/* コマンドスパン要素のスタイリング */
+header span[data-cmd] {
+	display: inline-block; 
+	font-size: 1em; 
+	margin-left: 0.25em; 
+	margin-bottom: 0.2em;
+	padding: 0.1em 1em; 
+	color: #fff; 
+	vertical-align: middle; 
+	border-radius: 5px;
+	cursor: pointer; 
+}
