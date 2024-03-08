@@ -108,3 +108,840 @@ header span[data-cmd] {
 	border-radius: 5px;
 	cursor: pointer; 
 }
+
+/*------------------------------------------------------------------------------*/
+
+
+header span[data-cmd]:hover {
+	background-color: #fff;
+	color: #333;
+}
+header span[data-label]::after {
+	content: attr(data-label);
+}
+header[data-section="transaction"] > span[data-mode] > span:not([data-required]) {
+	display: none !important;
+}
+/* 模擬試験中の問題ページには終了ボタンは表示しない */
+header[data-section="question"] > span[data-mode="exam"] > span[data-required] {
+	display: none !important;
+}
+header:not([data-in-progress="true"]) > span[data-mode="exam"] > span[data-state="inprogress"] {
+	display: none !important;
+}
+header:not([data-in-progress="false"]) > span[data-mode="exam"] > span[data-state="finished"] {
+	display: none !important;
+}
+
+header > span[data-profile-name]::after {
+	display: inline-block;
+	float: right;
+	width: max-content;
+	content: attr(data-profile-name);
+	margin-right: 0.25em;
+	padding: 0.125em;
+	font-size: 1.2em;
+	font-weight: bold;
+}
+
+main { margin: 0.5em }
+
+section { display: none; }
+section[data-current] { display: block; }
+section[data-current][data-display="true"] {
+	opacity: 1;
+	animation: fadein 0.1s;
+}
+section[data-current][data-display="false"] {
+	opacity: 1;
+	animation: fadeout 0.1s;
+}
+@keyframes fadeout {
+	from { opacity: 1; }
+	to { opacity: 0; }
+}
+@keyframes fadein {
+	from { opacity: 0; }
+	to { opacity: 1; }
+}
+
+/* Index */
+
+#index span.hint {
+	color: #666;
+}
+
+/* control */
+
+#control > div {
+	margin: 0;
+	padding: 0;
+	width: max-content;
+}
+#control > div > span {
+	display: inline-block;
+	box-sizing: border-box;
+	margin-top: 0.125em;
+	margin-left: 0.125em;
+}
+#control > div > span:first-child {
+	width: 8em;
+	text-align: right;
+	vertical-align: top;
+}
+#control > div > span:not(:first-child) {
+	border-left: solid 1px #eee;
+	padding-left: 0.5em;
+	font-size: 0.9em;
+}
+#control [data-category-all] {
+	display: inline-block;
+}
+#control [data-category-list] {
+	display: inline-block;
+	margin-left: 1em;
+}
+#control label {
+	margin-right: 1em;
+}
+#control label[data-count]::after {
+	content: "(" attr(data-count) ")";
+	color: #888;
+	font-size: 0.8em;
+}
+#control > div > span[data-selected] {
+	font-size: 1.25em;
+	color: #888;
+}
+#control > div > span[data-selected]::before {
+	font-size: 1.5em;
+	font-weight: bold;
+	content: attr(data-selected);
+	color: #333;
+}
+
+/* catalog */
+#catalog {
+	--color-head-fg: #fff;
+	--color-head-bg: #333;
+	--color-type0: #ddd;
+	--color-type1: #fcc;
+	--color-type2: #ccf;
+	--color-type3: #eee;
+	--color-type4: #ddd;
+
+	width: max-content;
+}
+#catalog > div {
+	margin: 0;
+	padding: 0;
+}
+#catalog > div > span {
+	display: inline-block;
+	box-sizing: border-box;
+	border: solid 1px var(--color-type0);
+	margin-top: 0.125em;
+	margin-left: 0.125em;
+	padding: 0.25em;
+	width: 3em;
+	text-align: center;
+	color: #333;
+}
+#catalog > div:first-child > span {
+	background-color: var(--color-head-bg);
+	color: var(--color-head-fg);
+}
+#catalog > div > span:first-child {
+	width: 8em;
+	text-align: right;
+}
+#catalog > div:not(:first-child) > span:first-child {background-color: var(--color-type4);}
+#catalog > div[data-dup='1'] > span:first-child {background-color: var(--color-type1);}
+#catalog > div[data-dup='2'] > span:first-child {background-color: var(--color-type2);}
+#catalog > div[data-dup='1'] > span {border-color: var(--color-type1);}
+#catalog > div[data-dup='2'] > span {border-color: var(--color-type2);}
+#catalog > div > span[data-dup='1'] {background-color: var(--color-type1);}
+#catalog > div > span[data-dup='2'] {background-color: var(--color-type2);}
+#catalog > div > span[data-dup='3'] {background-color: var(--color-type3);}
+
+#catalog > div:not(:first-child) > span:not([data-dup]):hover {
+	border-color: var(--color-head-bg);
+	cursor: pointer;
+}
+#catalog > div > span[data-ratio]::before {
+	content: attr(data-ratio);
+	font-size: 0.8em;
+}
+#catalog > div:not(:first-child) > span:not(:first-child):not([data-ratio])::before {content: "-";}
+#catalog > div > span[data-masked='true'] {visibility: hidden;}
+#catalog span[data-em] {
+	opacity: 1;
+	animation: fadein 0.5s;
+	border: solid 1px #333 !important;
+	background-color: #666 !important;
+	color: #fff !important;
+}
+
+/* Question */
+#question > div:first-child {
+	width: 920px;
+	background: #fff;
+	padding: 0em 0.5em 1em 0.5em;
+	letter-spacing: 0.08em;
+	word-break: break-all;
+	text-align: justify;
+	font-size: 0.9em;
+	line-height: 1.8em;
+}
+
+#question div[data-number] {
+	font-size: large;
+	color: #226;
+}
+#question div[data-number][data-mark]::after {
+	display: inline-block;
+	border-radius: 4px;
+	border: dotted 1px #c33;
+	color: #c33;
+	padding: 0.5em 0.5em 0.25em 0.5em;
+	margin-left: 0.5em;
+	font-weight: bold;
+	font-size: small;
+	line-height: 1em;
+	letter-spacing: 0em;
+	content: "✔ Marked";
+}
+
+#question div[data-title] {
+	text-align: right;
+	color: #888;
+}
+
+#question div[data-mondai] {
+	padding: 1em 0.5em;
+}
+
+#question div[data-answer] {
+	position: relative;
+	background: #eef;
+	border: 1px solid #ccc;
+	border-radius: 3px;
+	padding: 0px;
+}
+#question div.code {
+	margin-left: 1em;
+	font-size: 105%;
+}
+
+#question .code,
+#question .pre {
+	font-family: Consolas, monospace;
+	letter-spacing: 0;
+}
+
+#question .img_margin {
+	margin: 1em auto !important;
+	text-align: center;
+}
+
+#question img {
+	border: 0;
+	vertical-align: middle;
+}
+
+#question div[data-kaitou] img {
+	margin: 0.5em;
+}
+
+#question table[data-layout] {
+	display: none;
+}
+#question table[data-layout-on] {
+	display: table;
+	margin: 0.5em;
+}
+#question button {
+	border: 0px;
+	border-radius: 5px;
+	background-color: #ddd;
+}
+#question button:hover {
+	background-color: #eee;
+	border: solid 1px #ddd;
+}
+#question > div[data-in-progress] table[data-layout-on] button[data-answer] {
+	background-color: #666;
+	color: #fff;
+}
+#question table[data-layout-on] button[data-answer] {
+	background-color: #faa;
+}
+#question > div:not([data-in-progress]) table[data-layout-on] button[data-correct] {
+	background-color: #aaf !important;
+}
+
+#question table[data-layout] tr[data-erase] {
+	opacity: 0.3;
+	text-decoration: line-through;
+}
+#question table[data-layout] tr > td:first-child {
+	vertical-align: top;
+}
+#question table[data-layout] button {
+	width: 3em;
+	height: 2em;
+	padding: 0em;
+	margin-top: 0.25em;
+	margin-right: 0.5em;
+}
+#question table[data-layout] img {
+	vertical-align: top;
+}
+
+#question div[data-result] {
+	display: none;
+	background: #eee;
+	border: 1px solid #ccc;
+	border-radius: 3px;
+	margin-top: 0.25em;
+}
+#question div[data-answered] {
+	display: block;
+}
+#question div[data-result] > span:first-child {
+	display: inline-block;
+	padding: 0.5em;
+	padding-top: 0.75em;
+	padding-left: 0.75em;
+	font-size: 3em;
+	font-weight: bold;
+}
+#question div[data-result] > span:not(:first-child) {
+	font-size: 1.5em;
+}
+#question div[data-result] > span:not(:first-child) > a {
+	text-decoration: none;
+	color: #333;
+}
+#question div[data-result] > span[data-correct="true"]::before {
+	content: "✔ 正解 ";
+	color: #33f;
+}
+#question div[data-result] > span[data-correct="false"]::before {
+	content: "× 不正解 ";
+	color: #f33;
+}
+#question div[data-result] > span[data-correct="null"]::before {
+	content: "未解答 ";
+	color: #f33;
+}
+#question ul[data-history] {
+	color: #888;
+}
+#question ul[data-history]::before {
+	margin-left: -30px;
+	content: "出題履歴";
+}
+#question > div[data-in-progress] div[data-title],
+#question > div[data-in-progress] div[data-result],
+#question > div[data-in-progress] ul[data-history] {
+	visibility: hidden !important;
+}
+
+/* Transaction */
+#transaction div[data-description] {margin: 0.5em;}
+#transaction div[data-list] {width: max-content;}
+#transaction div[data-list] span {
+	display: inline-block;
+	box-sizing: border-box;
+	margin: 0px;
+	padding: 0.125em;
+	padding-left: 0.25em;
+	text-align: center;
+}
+#transaction div[data-header] > span {
+	background-color: #333;
+	color: #fff;
+	text-align: center !important;
+}
+#transaction div[data-list] div[data-question]:nth-child(odd) {background-color: #eef;}
+#transaction div[data-list] div[data-question]:hover {
+	background-color: #eee;
+	cursor: pointer;
+}
+#transaction div[data-list] span:nth-child(-n + 3) {width: 5em;}
+#transaction div[data-list] span:nth-child(4) {
+	width: 16em;
+	text-align: left;
+}
+#transaction div[data-list] span:nth-child(5) {
+	width: 20em;
+	text-align: left;
+}
+#transaction div[data-list="exam"][data-in-progress="true"] div[data-question]:not(:first-child) span:nth-last-child(-n + 2) {
+	visibility: hidden;
+}
+
+body[data-mode="exam"][data-in-progress="true"] #transaction div[data-result] {display: none;}
+#transaction div[data-result] {margin-top: 1em;}
+#transaction div[data-result] > span {
+	display: inline-block;
+	border: solid 1px #ccc;
+	width: 5em;
+	padding: 0.25em;
+	text-align: center;
+}
+#transaction div[data-result] > span:last-child {width: 10em;}
+
+#transaction div[data-result] > span[data-value]::before {content: attr(data-value);}
+#transaction div[data-result] > span:nth-child(odd) {
+	border-right: none;
+	background-color: #eee;
+}
+
+/* enter-transaction */
+#enter-transaction > div[data-description] {
+	margin: 0.5em;
+	margin-top: 1em;
+}
+
+#enter-transaction > div[data-description] > div {
+	border: solid 1px #ccc;
+	margin: 0.25em;
+}
+#enter-transaction > div[data-description] > div > span {
+	display: inline-block;
+	box-sizing: border-box;
+	margin: 0px;
+	padding: 0.125em;
+	padding-left: 0.5em;
+}
+
+#enter-transaction > div[data-description] > div > span:first-child {
+	width: 10em;
+	background-color: #eee;
+	text-align: center;
+}
+#enter-transaction > div[data-description] > div > span:not(:first-child) {
+	width: max-content;
+	background-color: #fff;
+}
+
+</style>
+<script>
+"use strict";
+
+const reader = new FileReader();
+
+let catalog = null;
+let category = null;
+let duplicate = null;
+let user = {
+	profile: null,
+	ratio: null,
+	transaction: null
+};
+let question = null;
+let exam = null;
+let timer = null;
+
+const preload = [
+	[ '/data/catalog.json', json => { catalog = json } ],
+	[ '/data/category.json', json => { category = json } ],
+	[ '/data/duplicate.json', json => { duplicate = json } ],
+	[ '/user/profile.json', json => { user.profile = json } ],
+	[ '/user/ratio.json', json => { user.ratio = json } ],
+	[ '/user/transaction.json', json => { user.transaction = json } ],
+];
+
+
+window.addEventListener('load', e => {
+	initialize();
+});
+
+window.addEventListener('dragover', e => {
+	e.preventDefault();
+	e.dataTransfer.dropEffect = 'copy';
+}, false);
+
+window.addEventListener('drop', e => {
+	e.preventDefault();
+	reader.addEventListener('load', eventExamLoad, false);
+	reader.readAsText(event.dataTransfer.files[0]);
+}, false);
+
+window.addEventListener("hashchange", e => {
+	switchSection(parseLocation());
+});
+
+
+
+async function initialize()
+{
+	const p = [];
+
+	// 並列データローディング
+	for (const pld of preload) {
+		const f =  fetch(pld[0]).then( r => {
+			return r.status == 200 ? r.json() : null;
+		}).then( json => {
+			if (json) {
+				pld[1](json);
+			}
+		});
+		p.push(f);
+	}
+
+	// すべてのデータロードを待機
+	await Promise.allSettled(p).then( results => {
+		// console.log(results);
+	});
+
+	// 初期化
+	initializeHeader();
+	initializeSectionCreate();
+	initializeSectionIndex();
+	initializeSectionQuestion();
+
+	// 表示
+	switchSection(parseLocation());
+}
+
+/*
+	header
+*/
+
+function initializeHeader()
+{
+	if (user.profile && user.profile.name) {
+		const tgt = document.querySelector('header > span[data-profile-name]');
+		tgt.dataset.profileName = user.profile.name;
+	}
+
+	for (const tgt of document.querySelectorAll('header span[data-cmd]')) {
+		tgt.addEventListener('click', e => {
+			// ヒストリを進める(parseLocationで上書きする)
+			document.querySelector('section[data-current]').dataset.display = false;
+			location.hash = tgt.dataset.cmd;
+		});
+	}
+}
+
+function switchSection(section)
+{
+	if (section === null) {
+		// hashchangeイベントハンドラが並列起動中なのでここでは処理しない
+		// イベントハンドラから再度sectionが指定されて呼び出される
+		return;
+	}
+
+	let tgt = document.querySelector('section[data-current]');
+	if (tgt) {
+		delete tgt.dataset.current;
+		if (tgt.dataset.display) {
+			delete tgt.dataset.display;
+		}
+	}
+	document.getElementById(section).dataset.current = true;
+	document.getElementById(section).dataset.display = true;
+
+	tgt = document.querySelector('header');
+	if (user.transaction) {
+		tgt.dataset.mode = user.transaction.mode;
+		tgt.dataset.section = section;
+		if (user.transaction.mode == 'exam') {
+			tgt.dataset.inProgress = user.transaction.inprogress;
+		}
+	} else {
+		delete tgt.dataset.mode;
+		delete tgt.dataset.section;
+		delete tgt.dataset.inprogress;
+	}
+}
+
+function parseLocation()
+{
+	// ユーザプロファイルがない場合は問答無用でプロファイル作成画面
+	if (user.profile == null) {
+		user.transaction = null;
+		return 'create';
+	}
+
+	// ハッシュあり
+	if (location.hash.length > 1) {
+		const s = location.hash.substring(1);
+
+		if (user.transaction && user.transaction.mode) {
+			// トランザクション中
+			return parseTransactionCommand(s);
+		} else {
+			// 単発問題
+			if (s.match(/^[0-9]{7}$/)) {
+				user.transaction = { mode: null };
+				loadQuestion(s);
+				return 'question';
+			}
+		}
+
+		// 謎ハッシュ、クリアして内部リダイレクト
+		location.replace('#');
+
+	// ハッシュなし
+	} else {
+		if (user.transaction && user.transaction.mode) {
+			// トランザクション中、内部リダイレクト
+			location.replace(`#${user.transaction.mode}:`);
+		} else {
+			user.transaction = null;
+			return 'index';
+		}
+	}
+
+	return null;
+}
+
+/*
+		section: create
+*/
+
+function initializeSectionCreate()
+{
+	const ctx = document.getElementById('create');
+
+	for (const input of ctx.querySelectorAll('input')) {
+		input.value = "";
+	}
+	ctx.querySelector('input[name=secret]').value = randomString(16);
+	ctx.querySelector('button').addEventListener('click', eventCreateProfile);
+}
+
+class FormItemInvalidException extends Error { }
+
+async function eventCreateProfile(e)
+{
+	const ctx = document.getElementById('create');
+
+	try {
+		const data = {
+			symbol: getOption(ctx, 'symbol'),
+			name: getText(ctx, 'name'),
+			email: getText(ctx, 'email'),
+			secret: getText(ctx, 'secret')
+		};
+
+		const opt = {
+			method: 'PUT',
+			headers: { 'Content-Type': 'application/json' },
+			body: JSON.stringify(data)
+		};
+
+		await fetch('/user/profile.json', opt).then( r => {
+		// 200 OK, 201 Created, 204 No Content
+			if ([200,201,204].includes(r.status)) {
+				user.profile = data;
+			}
+		});
+
+		if (user.profile) {
+			switchSection('index');
+		} else {
+			alert("ユーザプロファイルの作成に失敗しました。");
+		}
+
+	} catch (e) {
+		if (e instanceof FormItemInvalidException) {
+			alert('未入力・未選択の項目があります。');
+		} else {
+			throw e;
+		}
+	}
+}
+
+function getText(ctx, name)
+{
+	const s = ctx.querySelector(`input[name="${name}"]`).value.trim();
+	if (s.length == 0) {
+		throw new FormItemInvalidException();
+	}
+	return s;
+}
+
+function getOption(ctx, name)
+{
+	const o = ctx.querySelector(`select[name="${name}"] > option:checked`);
+	if (o) {
+		return o.value;
+	}
+	throw new FormItemInvalidException();
+}
+
+
+/*
+		section: index
+*/
+
+function initializeSectionIndex()
+{
+	const cat = Object.keys(catalog).reverse();
+	const catred = cat[1]; // >= catred 前回・前々回
+	const catblue = cat[2]; // == catblue 再利用開始年
+
+
+	// 正答数:受験回数 のデータを取得できなければ0で初期化
+	// この表の添え字は0～24
+	if (user.ratio == null) {
+		// 連想配列として扱われるためにゴミをつけておく(JSON入出力対策)
+		let r = { fakeitem: null };
+		for (const exam of cat) {
+			r[exam] = [];
+			for (let i = 0; i < 25; i++) {
+				r[exam][i] = [0,0];
+			}
+		}
+		user.ratio = r;
+	}
+
+	// 分野別フィルタ
+	const control = document.querySelector('#control');
+	{
+		const addCheckbox = (ctx, text, listener) => {
+			const label = document.createElement('label');
+			const input = document.createElement('input');
+
+			input.setAttribute('type', 'checkbox');
+			input.checked = true;
+			input.addEventListener('click', listener);
+
+			label.appendChild(input);
+			label.appendChild( document.createTextNode(text) );
+			ctx.appendChild(label);
+
+			return input;
+		};
+
+		let ctx = control.querySelector('[data-category-all]');
+		addCheckbox(ctx, 'すべて', eventCategoryReset).dataset.all = true;
+
+		ctx = control.querySelector('[data-category-list]');
+		for (let i = 0; i < category.index.length; i++) {
+			if (i == 5) {
+				ctx.appendChild(document.createElement('br'));
+			}
+			addCheckbox(ctx, category.index[i], eventCategoryChange).dataset.category = i;
+		}
+		// 問題数をカウント
+		let ccnt = []; // 総数(カテゴリ)
+		let cnd = []; // 非重複数(カテゴリ)
+		for (const [eid, arr] of Object.entries(category.data)) {
+			let i = 1;
+			for (const c of arr) {
+				if (!ccnt[c]) {
+					ccnt[c] = 0;
+					cnd[c] = 0;
+				}
+				ccnt[c]++;
+
+				const qid = eid * 100 + i;
+				if (!duplicate[qid] || qid > duplicate[qid][0]) {
+					cnd[c]++;
+				}
+
+				i++;
+			}
+		}
+		for (const tgt of control.querySelectorAll('input[data-category]')) {
+			// <label data-count="nnn">
+			const c = parseInt(tgt.dataset.category);
+			tgt.parentNode.dataset.count = cnd[c] + '/' + ccnt[ c ];
+		}
+		updateControlCategoryAll();
+	}
+
+	// 正答率/着手回数フィルタ
+	updateControlRatio();
+
+	for (const tgt of control.querySelectorAll('input[name=correct], input[name=count]')) {
+		tgt.addEventListener('click', eventRatioChange);
+	}
+
+	// 開始ボタン
+	control.querySelector('button').addEventListener('click', eventDrillStart);
+
+
+	// 問題一覧
+	const box = document.getElementById('catalog');
+	// header
+	{
+		const row = document.createElement('div');
+		const first = document.createElement('span');
+		first.textContent = '試験/問題番号';
+		row.appendChild(first);
+		for (let i = 1; i <= 25; i++) {
+			const nth = document.createElement('span');
+			nth.textContent = i;
+			row.appendChild(nth);
+		}
+		box.appendChild(row);
+	}
+	// body
+	{
+		for (const exam of cat) {
+			const row = document.createElement('div');
+			const first = document.createElement('span');
+			first.textContent = catalog[exam];
+			first.dataset.eid = exam;
+			first.addEventListener('click', eventKakoStart);
+
+			if (exam >= catred) {
+				row.dataset.dup = 1;
+			} else if (exam == catblue) {
+				row.dataset.dup = 2;
+			}
+			row.appendChild(first);
+
+			for (let i = 1; i <= 25; i++) {
+				const qid = exam * 100 + i;
+				const nth = document.createElement('span');
+				nth.dataset.qid = qid;
+				nth.dataset.cid = category.data[exam][i-1];
+
+				let dup = false;
+				if (duplicate[qid]) {
+					nth.dataset.rid = duplicate[qid][0];
+					for (const rid of duplicate[qid]) {
+						if (rid > qid) {
+							if (rid >= catred * 100) {
+								nth.dataset.dup = 1;
+							} else if (Math.floor(rid / 100) == catblue) {
+								nth.dataset.dup = 2;
+							} else {
+								nth.dataset.dup = 3;
+							}
+							dup = true;
+							break;
+						}
+					}
+				}
+
+				if (dup == false) {
+					nth.addEventListener('click', e => { location.hash = `#${qid}` });
+					nth.addEventListener('mouseover', e => {
+						for (const tgt of document.querySelectorAll(`#catalog span[data-rid="${qid}"]`)) {
+							tgt.dataset.em = true;
+						}
+					});
+					nth.addEventListener('mouseout', e => {
+						for (const tgt of document.querySelectorAll('#catalog span[data-em]')) {
+							delete tgt.dataset.em;
+						}
+					});
+				}
+				row.appendChild(nth);
+			}
+			box.appendChild(row);
+		}
+	}
+
+	updateCatalogRatio();
+	updateCatalog();
+}
