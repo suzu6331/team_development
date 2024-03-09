@@ -943,9 +943,237 @@ function initializeSectionIndex()
 	updateCatalog();
 }
 
+// 過去問を一回分Drill
+function eventKakoStart(e)
+{
+	const eid = parseInt(e.target.dataset.eid);
+	const data = [];
 
+	for (let i = 0; i < 25; i++) {
+		data[i] = { qid: eid * 100 + i + 1, answer: null, correct: null, mark: false };
+	}
 
+	createTransaction('drill', data, () => { location.hash = '#drill:0' });
+}
 
+// フィルタを利用した問題選択からDrill
+function eventDrillStart(e)
+{
+	const mode = document.querySelector('#control input[name="order"]:checked').value;
+	const data = [];
+
+	const qarr = document.querySelectorAll('#catalog > div:not(:first-child) > span:not(:first-child):not([data-masked="true"])')
+
+	if (qarr.length == 0) {
+		alert('問題が選択されていません。');
+		return;
+	}
+
+	for (const tgt of qarr) {
+		const qid = parseInt(tgt.dataset.qid);
+		let sortkey = 0;
+
+		if (duplicate[qid] && qid < duplicate[qid][0]) {
+			continue;
+		}
+
+		switch (mode) {
+		// 低レシオ順
+		case 'lowratio':
+			const q = parseQid(qid);
+			const ratio = user.ratio[q.exam.id][q.number-1];
+			if (ratio[1] > 0) {
+				sortkey = ratio[0] * 100 / ratio[1]; // 低レシオは非優先グループ内でレシオ昇順
+			} else {
+				sortkey = Math.random(); // 未着手は優先グループ内でランダム
+			}
+			break;
+		// 新しい順
+		case 'newer':
+			sortkey = 0 - qid;
+			break;
+		// 古い順
+		case 'older':
+			sortkey = qid;
+			break;
+		// ランダム
+		case 'random':
+		default:
+			sortkey = Math.random() * 100;
+			break;
+		}
+
+		data.push({qid: qid, answer: null, correct: null, mark: false, order: sortkey});
+	}
+
+	data.sort( (a,b) => { return a.order - b.order } );
+
+	createTransaction('drill', data, () => { location.hash = '#drill:0' });
+}
+
+// 分野フィルタの選択・解除
+function eventCategoryChange(e)
+{
+	// 「すべて」の状態を操作
+	const all = document.querySelector('#control input[data-all]');
+	const ncheck = document.querySelectorAll('#control [data-category-list] input[data-category]:checked').length;
+	if (ncheck == category.index.length) {
+		all.indeterminate = false;
+		all.checked = true;
+	} else if (ncheck == 0) {
+		all.indeterminate = false;
+		all.checked = false;
+	} else {
+		all.indeterminate = true;
+		all.checked = false;
+	}
+
+	updateControlCategoryAll();
+	updateCatalog();
+}
+
+// 分野フィルタの「すべて」による全選択・全解除
+function eventCategoryReset(e)
+{
+	const all = e.target;
+	let sw = all.checked;
+
+	for (const tgt of document.querySelectorAll('#control [data-category-list] input[data-category]')) {
+		tgt.checked = sw;
+	}
+
+	updateControlCategoryAll();
+	updateCatalog();
+}
+
+function eventRatioChange(e)
+{
+	updateCatalog();
+}
+
+function updateCatalogRatio()
+{
+	for (const tgt of document.querySelectorAll('#catalog > div > span[data-ratio]')) {
+		delete tgt.dataset.ratio;
+	}
+
+	for (const exam of Object.keys(catalog)) {
+		for (let i = 0; i < 25; i++) {
+			const ratio = user.ratio[exam][i];
+			if (ratio[1] > 0) {
+				const qid = exam * 100 + i + 1;
+				const tgt = document.querySelector(`#catalog > div > span[data-qid="${qid}"]`);
+					tgt.dataset.ratio = Math.round(ratio[0] * 1000 / ratio[1]) / 10;
+			}
+		}
+	}
+}
+
+function isMasked(tgt)
+{
+	const qid = parseInt(tgt.dataset.qid);
+	const cid = parseInt(tgt.dataset.cid);
+	const ctx = document.querySelector('#control');
+
+	// 1.分野フィルタをチェック
+	if (ctx.querySelector(`input[data-category="${cid}"]`).checked == false) {
+		return true; // 対象分野が選択されていない
+	}
+
+	const q = parseQid(qid);
+	const ratio = user.ratio[q.exam.id][q.number-1];
+
+	// 2.着手回数フィルタをチェック
+	const tbase = parseInt(ctx.querySelector('input[name="count"]:checked').value);
+	if (ratio[1] >= tbase) {
+		return true; // 着手回数が選択基準を上回っている
+	}
+
+	// 3.正答率フィルタをチェック
+	const pct = ratio[1] == 0 ? 0 : ratio[0] * 100 / ratio[1];
+	const sbase = parseInt(ctx.querySelector('input[name="correct"]:checked').value);
+	if (pct >= sbase) {
+		return true; // 正答率が選択基準を上回っている
+	}
+
+	return false; // いずれのフィルタにもかからなかった
+}
+
+// 分野フィルタの「すべて」の集計を再計算
+function updateControlCategoryAll()
+{
+	let sum = 0;
+	let sumnd = 0;
+
+	for (const tgt of document.querySelectorAll('#control input[data-category]:checked')) {
+		const c = tgt.parentNode.dataset.count.split('/');
+		sumnd += parseInt(c[0]);
+		sum += parseInt(c[1]);
+	}
+	document.querySelector('#control [data-category-all] label').dataset.count = sumnd + '/' + sum;
+}
+
+function updateControlRatio()
+{
+	const sbase = [];
+	const scnt = []
+	const scnd = [];
+	const stgt = document.querySelectorAll('#control input[name="correct"]');
+	for (const tgt of stgt) {
+		sbase.push( parseInt(tgt.value) );
+		scnt.push(0);
+		scnd.push(0);
+	}
+
+	const tbase = [];
+	const tcnt = []
+	const tcnd = [];
+	const ttgt = document.querySelectorAll('#control input[name="count"]');
+	for (const tgt of ttgt) {
+		tbase.push( parseInt(tgt.value) );
+		tcnt.push(0);
+		tcnd.push(0);
+	}
+
+	for (const eid of Object.keys(catalog)) {
+		for (let i = 0; i < 25; i++) {
+			const qid = eid * 100 + i + 1;
+			const nodup = !duplicate[qid] || qid > duplicate[qid][0]; // 非重複または重複問題の中で最新
+
+			// 正答率フィルタの該当する項目に計上
+			for (let j = 0; j < sbase.length; j++) {
+				const ratio = user.ratio[eid][i];
+				const pct = ratio[1] == 0 ? 0 : ratio[0] * 100 / ratio[1];
+
+				if (pct < sbase[j]) {
+					if (nodup) {
+						scnd[j]++;
+					}
+					scnt[j]++;
+				}
+			}
+
+			// 着手回数フィルタの該当する項目に計上
+			for (let j = 0; j < tbase.length; j++) {
+				if (user.ratio[eid][i][1] < tbase[j]) {
+					if (nodup) {
+						tcnd[j]++;
+					}
+					tcnt[j]++;
+				}
+			}
+
+		}
+	}
+
+	for (let i = 0; i < stgt.length; i++) {
+		stgt[i].parentNode.dataset.count = scnd[i] + '/' + scnt[i];
+	}
+
+	for (let i = 0; i < ttgt.length; i++) {
+		ttgt[i].parentNode.dataset.count = tcnd[i] + '/' + tcnt[i];
+	}
+}
 
 </script>
 </head>
@@ -962,15 +1190,6 @@ function initializeSectionIndex()
 		<span class="lsf-icon" data-icon="right" data-cmd="#drill:next" data-label="Next"></span>
 		<span class="lsf-icon" data-icon="check" data-cmd="#drill:mark" data-label="Mark"></span>
 	</span>
-	<span data-mode="exam">
-		<span class="lsf-icon" data-icon="logout" data-cmd="#exam:leave" data-label="Finish" data-required data-state="inprogress"></span>
-		<span class="lsf-icon" data-icon="logout" data-cmd="#exam:exit" data-label="Exit" data-required data-state="finished"></span>
-		<span class="lsf-icon" data-icon="list" data-cmd="#exam:" data-label="Index"></span>
-		<span class="lsf-icon" data-icon="left" data-cmd="#exam:prev" data-label="Prev"></span>
-		<span class="lsf-icon" data-icon="right" data-cmd="#exam:next" data-label="Next"></span>
-		<span class="lsf-icon" data-icon="check" data-cmd="#exam:mark" data-label="Mark"></span>
-		<span class="lsf-icon" data-icon="time" data-label="" data-required></span>
-	</span>
 
 	<span data-profile-name></span>
 </header>
@@ -979,33 +1198,7 @@ function initializeSectionIndex()
 
 <section id="create">
 	<h1>ユーザプロファイルの作成</h1>
-	<div>
-		<select name="symbol">
-		<option></option>
-		<option>CT4A</option>
-		<option>CT4B</option>
-		<option>CT3A</option>
-		<option>CT3B</option>
-		<option>CT2A</option>
-		<option>CT2B</option>
-		<option>CT1A</option>
-		<option>CT1B</option>
-		<option>CS3</option>
-		<option>CS2</option>
-		<option>CS1</option>
-		<option>C2</option>
-		<option>C1</option>
-		<option>AI2</option>
-		<option>AI1</option>
-		<option>CV2</option>
-		<option>CV1</option>
-		<option>CK</option>
-		</select> ※クラスを選択<br>
-		<input type="text" name="name" placeholder="氏名"> ※正式な姓名で<br>
-		<input type="text" name="email" placeholder="メールアドレス"> ※ユーザの識別に使用されます<br>
-		<input type="text" name="secret"> ※サーバ同期に使用されるシークレットです<br>
-		<button>作成</button>
-	</div>
+	
 </section>
 
 <section id="index">
@@ -1024,16 +1217,6 @@ function initializeSectionIndex()
 				<label><input type="radio" name="correct" value="80">正答率80%未満</label>
 				<label><input type="radio" name="correct" value="60">正答率60%未満</label>
 				<label><input type="radio" name="correct" value="40">正答率40%未満</label>
-			</span>
-		</div>
-		<div>
-			<span>着手回数</span>
-			<span>
-				<label><input type="radio" name="count" value="10000" checked>すべて</label>
-				<label><input type="radio" name="count" value="10">10回未満</label>
-				<label><input type="radio" name="count" value="5">5回未満</label>
-				<label><input type="radio" name="count" value="3">3回未満</label>
-				<label><input type="radio" name="count" value="1">未着手</label>
 			</span>
 		</div>
 		<div>
