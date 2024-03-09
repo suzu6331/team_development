@@ -942,3 +942,191 @@ function initializeSectionIndex()
 	updateCatalogRatio();
 	updateCatalog();
 }
+
+
+
+
+
+</script>
+</head>
+<body>
+
+<header data-mode="null">
+	<span data-mode="null">
+		<span class="lsf-icon" data-icon="home" data-cmd="#">Home</span>
+	</span>
+	<span data-mode="drill">
+		<span class="lsf-icon" data-icon="logout" data-cmd="#drill:exit" data-label="Exit" data-required></span>
+		<span class="lsf-icon" data-icon="list" data-cmd="#drill:" data-label="Index"></span>
+		<span class="lsf-icon" data-icon="left" data-cmd="#drill:prev" data-label="Prev"></span>
+		<span class="lsf-icon" data-icon="right" data-cmd="#drill:next" data-label="Next"></span>
+		<span class="lsf-icon" data-icon="check" data-cmd="#drill:mark" data-label="Mark"></span>
+	</span>
+	<span data-mode="exam">
+		<span class="lsf-icon" data-icon="logout" data-cmd="#exam:leave" data-label="Finish" data-required data-state="inprogress"></span>
+		<span class="lsf-icon" data-icon="logout" data-cmd="#exam:exit" data-label="Exit" data-required data-state="finished"></span>
+		<span class="lsf-icon" data-icon="list" data-cmd="#exam:" data-label="Index"></span>
+		<span class="lsf-icon" data-icon="left" data-cmd="#exam:prev" data-label="Prev"></span>
+		<span class="lsf-icon" data-icon="right" data-cmd="#exam:next" data-label="Next"></span>
+		<span class="lsf-icon" data-icon="check" data-cmd="#exam:mark" data-label="Mark"></span>
+		<span class="lsf-icon" data-icon="time" data-label="" data-required></span>
+	</span>
+
+	<span data-profile-name></span>
+</header>
+
+<main>
+
+<section id="create">
+	<h1>ユーザプロファイルの作成</h1>
+	<div>
+		<select name="symbol">
+		<option></option>
+		<option>CT4A</option>
+		<option>CT4B</option>
+		<option>CT3A</option>
+		<option>CT3B</option>
+		<option>CT2A</option>
+		<option>CT2B</option>
+		<option>CT1A</option>
+		<option>CT1B</option>
+		<option>CS3</option>
+		<option>CS2</option>
+		<option>CS1</option>
+		<option>C2</option>
+		<option>C1</option>
+		<option>AI2</option>
+		<option>AI1</option>
+		<option>CV2</option>
+		<option>CV1</option>
+		<option>CK</option>
+		</select> ※クラスを選択<br>
+		<input type="text" name="name" placeholder="氏名"> ※正式な姓名で<br>
+		<input type="text" name="email" placeholder="メールアドレス"> ※ユーザの識別に使用されます<br>
+		<input type="text" name="secret"> ※サーバ同期に使用されるシークレットです<br>
+		<button>作成</button>
+	</div>
+</section>
+
+<section id="index">
+	<div id="control">
+		<div>
+			<span>分野</span>
+			<span>
+				<span data-category-all></span><br>
+				<span data-category-list></span>
+			</span>
+		</div>
+		<div>
+			<span>正答率</span>
+			<span>
+				<label><input type="radio" name="correct" value="101" checked>すべて</label>
+				<label><input type="radio" name="correct" value="80">正答率80%未満</label>
+				<label><input type="radio" name="correct" value="60">正答率60%未満</label>
+				<label><input type="radio" name="correct" value="40">正答率40%未満</label>
+			</span>
+		</div>
+		<div>
+			<span>着手回数</span>
+			<span>
+				<label><input type="radio" name="count" value="10000" checked>すべて</label>
+				<label><input type="radio" name="count" value="10">10回未満</label>
+				<label><input type="radio" name="count" value="5">5回未満</label>
+				<label><input type="radio" name="count" value="3">3回未満</label>
+				<label><input type="radio" name="count" value="1">未着手</label>
+			</span>
+		</div>
+		<div>
+			<span>出題順</span>
+			<span>
+				<label><input type="radio" name="order" value="lowratio" checked>未着手・正答率の低い問題を優先</label>
+				<label><input type="radio" name="order" value="newer">新しい順</label>
+				<label><input type="radio" name="order" value="older">古い順</label>
+				<label><input type="radio" name="order" value="random">ランダム</label>
+			</span>
+		</div>
+		<div>
+			<span><button>開始</button></span>
+			<span data-selected="0"> 問選択</span>
+			<span class="hint">※問題は 分野 AND 正答率 AND 着手回数 で選択し実行します。<br>
+			※試験名をクリックした場合は、選択・重複・順序指定を無視して問1～25までを順に実行します。
+			</span>
+		</div>
+	</div>
+
+	<div id="catalog"></div>
+
+	<div style="margin:0.5em">
+		<span class="hint">※問題の同定、分類は<a href="https://www.sc-siken.com/" target="_brank">情報処理安全確保支援士試験ドットコム</a>掲載の情報に基づきます。分類についてやや不確かなところがあります。</span>
+	</div>
+</section>
+
+
+<section id="question">
+	<div>
+		<div data-title></div>
+		<div data-number></div>
+		<div data-mondai></div>
+		<div data-answer>
+			<div data-kaitou></div>
+			<table data-layout="1">
+			<tr><td><button data-value="0">ア</button></td><td><div data-option="0"></div></td></tr>
+			<tr><td><button data-value="1">イ</button></td><td><div data-option="1"></div></td></tr>
+			<tr><td><button data-value="2">ウ</button></td><td><div data-option="2"></div></td></tr>
+			<tr><td><button data-value="3">エ</button></td><td><div data-option="3"></div></td></tr>
+			</table>
+			<table data-layout="2">
+			<tr>
+				<td><button data-value="0">ア</button></td>
+				<td><button data-value="1">イ</button></td>
+				<td><button data-value="2">ウ</button></td>
+				<td><button data-value="3">エ</button></td>
+			</tr>
+			</table>
+			<table data-layout="3">
+			<tr>
+				<td><button data-value="0">ア</button></td><td><div data-option="0"></div></td>
+				<td><button data-value="1">イ</button></td><td><div data-option="1"></div></td>
+			</tr>
+			<tr>
+				<td><button data-value="2">ウ</button></td><td><div data-option="2"></div></td>
+				<td><button data-value="3">エ</button></td><td><div data-option="3"></div></td>
+			</tr>
+			</table>
+		</div>
+		<div data-result>
+			<span></span>
+			<span>
+				<a class="lsf-icon" data-icon="external" href="" target="_brank">解説 (sc-siken.com)</a>
+			</span>
+		</div>
+
+		<ul data-history></ul>
+	</div>
+</section>
+
+<section id="transaction">
+	<div data-title></div>
+	<div data-description></div>
+	<div data-list>
+		<div data-header>
+			<span>問題</span><span>解答</span><span>マーク</span><span>過去問題</span><span>分野</span>
+		</div>
+	</div>
+	<div data-result>
+		<span>正解</span><span data-correct></span>
+		<span>不正解</span><span data-incorrect></span>
+		<span>未解答</span><span data-noanswered></span>
+		<span>成績</span><span data-ratio></span>
+	</div>
+</section>
+
+<section id="enter-transaction">
+	<div data-description></div>
+	<button>開始</button>
+</section>
+
+</main>
+
+</body>
+</html>
