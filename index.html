@@ -1174,6 +1174,715 @@ function updateControlRatio()
 		ttgt[i].parentNode.dataset.count = tcnd[i] + '/' + tcnt[i];
 	}
 }
+// 問題一覧表の再表示
+function updateCatalog()
+{
+	let cnt = 0;
+
+	for (const tgt of document.querySelectorAll('#catalog span[data-cid]')) {
+		const m = isMasked(tgt);
+		tgt.dataset.masked = isMasked(tgt);
+		if (!m) {
+			const qid = tgt.dataset.qid;
+			const nodup = !duplicate[qid] || qid > duplicate[qid][0]; // 非重複または重複問題の中で最新
+			if (nodup) {
+				cnt++;
+			}
+		}
+	}
+
+	document.querySelector('#control span[data-selected]').dataset.selected = cnt;
+}
+
+/*
+		section: question
+*/
+
+function initializeSectionQuestion()
+{
+	for (const tgt of document.querySelectorAll('#question table[data-layout] button')) {
+		tgt.addEventListener('click', eventAnswerSelected);
+	}
+	for (const tgt of document.querySelectorAll('#question table[data-layout="1"] tr')) {
+		tgt.addEventListener('click', eventAnswerToggle);
+	}
+}
+
+async function loadQuestion(qid)
+{
+	const req = fetch(`/data/${qid}.json`);
+
+	const ctx = document.getElementById('question');
+	cleanupQuestion(ctx);
+	const q = parseQid(qid);
+
+	await req.then( r => { return r.json() } ).then( json => { question = json } );
+
+
+	// 問題番号
+	ctx.querySelector('div[data-number]').textContent = `問${q.number}`;
+
+	// 試験名
+	const cname = category.index[ question.bunrui ];
+	ctx.querySelector('div[data-title]').textContent = `${q.exam.seireki}(${q.exam.warekiKanji}${q.exam.wareki})年 ${q.exam.season.kanji} 問${q.number} (${cname})`;
+
+	// 問題文を挿入
+	ctx.querySelector('div[data-mondai]').innerHTML = question.mondai;
+
+	// 解答群画像があれば挿入
+	if (question.kaitou) {
+		ctx.querySelector('div[data-kaitou]').innerHTML = question.kaitou;
+	}
+
+	// レイアウトを選択して選択肢を挿入
+	const layout = question.sentaku ? 1 : 2;
+	const layoutctx = ctx.querySelector(`table[data-layout="${layout}"]`);
+	for (let tgt of layoutctx.querySelectorAll('div[data-option]')) {
+		const span = document.createElement('span');
+		span.innerHTML = question.sentaku[ parseInt(tgt.dataset.option) ];
+		tgt.appendChild(span);
+	}
+	layoutctx.dataset.layoutOn = true;
+
+	// 画像の読み込み
+	for (const img of ctx.querySelectorAll('img[data-image-index]')) {
+		const n = img.dataset.imageIndex;
+		img.src = `/data/images/${qid}-${n}.gif`;
+	}
+
+	// 出題履歴
+	if (duplicate[qid]) {
+		const histlist = ctx.querySelector('ul[data-history]');
+		for (const dupid of duplicate[qid]) {
+			const li = document.createElement('li');
+			const q = parseQid(dupid);
+			li.textContent = `${q.exam.seireki}(${q.exam.warekiKanji}${q.exam.wareki})年 ${q.exam.season.kanji} 問${q.number}`
+			histlist.appendChild(li);
+		}
+	}
+}
+
+function cleanupQuestion(ctx)
+{
+	delete document.querySelector('#question > div:first-child').dataset.inProgress;
+
+	ctx.querySelector('div[data-number]').textContent = "";
+	ctx.querySelector('div[data-title]').textContent = "";
+	ctx.querySelector('div[data-mondai]').textContent = "";
+	ctx.querySelector('div[data-kaitou]').textContent = "";
+
+	let tgt = ctx.querySelector('div[data-number]');
+	if (tgt.dataset.mark) {
+		delete tgt.dataset.mark;
+	}
+
+	const layout = ctx.querySelector('table[data-layout-on]');
+	if (layout) {
+		delete layout.dataset.layoutOn;
+	}
+
+	for (let tgt of ctx.querySelectorAll('tr[data-erase]')) {
+		delete tgt.dataset.erase;
+	}
+
+	for (let tgt of ctx.querySelectorAll('div[data-option]')) {
+		tgt.textContent = "";
+	}
+
+	tgt = ctx.querySelector('button[data-answer]');
+	if (tgt) {
+		delete tgt.dataset.answer;
+	}
+
+	tgt = ctx.querySelector('button[data-correct]');
+	if (tgt) {
+		delete tgt.dataset.correct;
+	}
+
+	const answered = ctx.querySelector('div[data-answered]');
+	if (answered) {
+		delete answered.dataset.answered;
+		delete answered.querySelector('span[data-correct]').dataset.correct;
+		answered.querySelector('a').href = "";
+	}
+
+	ctx.querySelector('ul[data-history]').textContent = '';
+}
+
+function eventAnswerSelected(e)
+{
+	const ctx = document.getElementById('question');
+	const tgt = e.target;
+
+	// drill解答済み
+	if (!user.transaction.inprogress && ctx.querySelector('div[data-answered]')) {
+		return;
+	}
+
+	let answer = parseInt(tgt.dataset.value);
+	let correct = question.answer;
+
+	// トランザクション中
+	if (user.transaction && user.transaction.mode) {
+		// 模擬試験中は再選択が可能
+		if (user.transaction.inprogress) {
+			const button = ctx.querySelector('table[data-layout-on] button[data-answer]');
+			if (button) {
+				// 選択済みボタンを解除
+				delete button.dataset.answer;
+			}
+			if (user.transaction.data[user.transaction.cursor].answer !== answer) {
+				// 異なる選択肢を選択
+				user.transaction.data[user.transaction.cursor].answer = answer;
+			} else {
+				// 選択済みボタンを選択→未選択
+				user.transaction.data[user.transaction.cursor].answer = null;
+				answer = null;
+			}
+		}
+
+		user.transaction.data[user.transaction.cursor].answer = answer;
+		saveTransaction( e => { console.log('saved.'); } );
+	}
+
+	// ボタンに反映
+	if (answer !== null) {
+		ctx.querySelector(`table[data-layout-on] button[data-value="${answer}"]`).dataset.answer = true;
+	}
+	ctx.querySelector(`table[data-layout-on] button[data-value="${correct}"]`).dataset.correct = true;
+
+	// 結果
+	ctx.querySelector('div[data-result]').dataset.answered = true;
+	ctx.querySelector('div[data-result] span').dataset.correct = answer == correct;
+
+	ctx.querySelector('a').href = qid2url(question.id) + '#kaisetsu';
+}
+
+function eventAnswerToggle(e)
+{
+	if (e.target.tagName == 'BUTTON') {
+		return;
+	}
+
+	let tgt = e.target;
+	while (tgt.tagName != 'TR') {
+		tgt = tgt.parentNode;
+	}
+
+	if (tgt.dataset.erase) {
+		delete tgt.dataset.erase;
+	} else {
+		tgt.dataset.erase = true;
+	}
+}
+/*
+		section: transaction
+*/
+function loadTransaction()
+{
+	const body = document.querySelector('body');
+	body.dataset.mode = user.transaction.mode;
+	body.dataset.inProgress = user.transaction.inprogress;
+
+	const ctx = document.getElementById('transaction');
+
+	for (const tgt of ctx.querySelectorAll('div[data-title], div[data-description')) {
+		tgt.textContent = '';
+	}
+	for (const tgt of ctx.querySelectorAll('div[data-question]')) {
+		tgt.parentNode.removeChild(tgt);
+	}
+
+	if (user.transaction.title) {
+		ctx.querySelector('div[data-title]').textContent = user.transaction.title;
+	}
+	if (user.transaction.description) {
+		ctx.querySelector('div[data-description]').textContent = user.transaction.description;
+	}
+
+	const box = ctx.querySelector('div[data-list]');
+	box.dataset.list = user.transaction.mode;
+	box.dataset.inProgress = user.transaction.inprogress;
+
+	for (let i = 0; i < user.transaction.data.length; i++) {
+		const item = user.transaction.data[i];
+		const q = parseQid(item.qid);
+		const cname = category.index[ category.data[q.exam.id][q.number-1] ];
+
+		const div = document.createElement('div');
+		div.dataset.question = i;
+		div.addEventListener('click', eventTransactionQuestionSelected);
+
+		// 問題番号
+		let span = document.createElement('span');
+		span.textContent = i + 1;
+		div.appendChild(span);
+
+		// 解答
+		span = document.createElement('span');
+		span.textContent = '-';
+		if (user.transaction.mode == 'exam' && user.transaction.inprogress) {
+			if (item.answer !== null) {
+				span.textContent = "✔";
+			}
+		} else {
+			if (item.answer !== null && item.correct !== null) {
+				span.textContent = item.answer == item.correct ? "○" : "×";
+			}
+		}
+		div.appendChild(span);
+
+		// マーク
+		span = document.createElement('span');
+		span.textContent = item.mark ? "✔" : "";
+		div.appendChild(span);
+
+		// 過去問
+		span = document.createElement('span');
+		span.textContent = `${q.exam.seireki}(${q.exam.warekiKanji}${q.exam.wareki})年 ${q.exam.season.kanji} 問${q.number}`;
+		div.appendChild(span);
+
+		// 分野
+		span = document.createElement('span');
+		span.textContent = cname;
+		div.appendChild(span);
+
+		box.appendChild(div);
+	}
+
+	// 下部成績
+	{
+		let total = user.transaction.data.length;
+		let correct = 0;
+		let incorrect = 0;
+		let noanswered = 0;
+
+		for (let i = 0; i < user.transaction.data.length; i++) {
+			const item = user.transaction.data[i];
+			if (item.answer !== null && item.correct !== null) {
+				if (item.answer == item.correct) {
+					correct++;
+				} else {
+					incorrect++;
+				}
+			} else {
+				noanswered++;
+			}
+		}
+		const ratio = Math.round(correct * 10000 / total) / 100;
+
+		ctx.querySelector('span[data-correct]').dataset.value = correct;
+		ctx.querySelector('span[data-incorrect]').dataset.value = incorrect;
+		ctx.querySelector('span[data-noanswered]').dataset.value = noanswered;
+		ctx.querySelector('span[data-ratio]').dataset.value = `${ratio}% (${correct}/${total})`;
+	}
+}
+
+function parseTransactionCommand(command)
+{
+	const m = command.match(/^(drill|exam):([a-zA-Z0-9]*)$/);
+
+	if (!m) {
+		// 未実装コマンドまたは謎ハッシュ、クリアして内部リダイレクト
+		location.replace('#');
+		return null;
+	}
+
+	const mode = m[1];
+	const cmd = m[2];
+
+	if (user.transaction.mode == 'exam') {
+		elapsedTime();
+		if (user.transaction.inprogress && timer == null) {
+			timer = window.setInterval(eventTimerTick, 1000);
+		}
+	}
+
+
+	// トランザクション中の問題
+	if (cmd.match(/^[0-9]+$/)) {
+		loadTransactionQuestion(m[2]);
+		return 'question';
+	}
+
+	// 模擬試験エントランス
+	if (mode == 'exam' && cmd == 'enter') {
+		return 'enter-transaction';
+	}
+
+	// 模擬試験結果
+	if (mode == 'exam' && cmd == 'leave') {
+		window.clearInterval(timer);
+		user.transaction.finish = Date.now();
+		user.transaction.inprogress = false;
+		saveTransaction(() => { location.hash = '#exam:'; });
+		return null;
+	}
+
+	// トランザクションコマンド
+	if (cmd == 'next' || cmd == 'prev') {
+		let n = user.transaction.cursor;
+		if (cmd == 'next') {
+			n++;
+		} else if (cmd == 'prev') {
+			n--;
+		}
+
+		if (n < 0 || n >= user.transaction.data.length) {
+			// カーソルがレンジ外
+			user.transaction.cursor = 0;
+			location.replace(`#${user.transaction.mode}:`);
+		} else {
+			user.transaction.cursor = n;
+			location.replace(`#${user.transaction.mode}:${n}`);
+		}
+		return null;
+	}
+
+	if (cmd == 'mark') {
+		// トグルマーク
+		let n = user.transaction.cursor;
+		let mark = user.transaction.data[n].mark;
+		user.transaction.data[n].mark = !mark;
+		saveTransaction( e => { console.log('transaction data saved.') } );
+		user.transaction.cursor = n;
+		location.replace(`#${user.transaction.mode}:${n}`);
+		return null;
+	}
+
+	if (cmd == 'exit') {
+		// トランザクション終了
+		terminateTransaction();
+		return null;
+	}
+
+	// デフォルトor不明コマンド
+	loadTransaction();
+	return 'transaction';
+}
+
+async function loadTransactionQuestion(n)
+{
+	n = parseInt(n);
+
+	if (n < 0 || n >= user.transaction.data.length) {
+		user.transaction.cursor = 0;
+		location.hash = `#${user.transaction.mode}:`;
+		return;
+	}
+
+	user.transaction.cursor = n;
+	const qid = user.transaction.data[n].qid;
+
+	const req = fetch(`/data/${qid}.json`);
+
+	const ctx = document.getElementById('question');
+	cleanupQuestion(ctx);
+	const q = parseQid(qid);
+
+	await req.then( r => { return r.json() } ).then( json => { question = json } );
+
+	// モード
+	if (user.transaction.inprogress) {
+		ctx.querySelector('#question > div:first-child').dataset.inProgress = true;
+	} else {
+		delete ctx.querySelector('#question > div:first-child').dataset.inProgress;
+	}
+
+	// 正解を転記
+	user.transaction.data[n].correct = question.answer;
+
+	// 問題番号
+	const qn = user.transaction.cursor + 1;
+	const nctx = ctx.querySelector('div[data-number]');
+	nctx.textContent = `問${qn}`;
+	if (user.transaction.data[n].mark) {
+		nctx.dataset.mark = true;
+	}
+
+	// 試験名
+	const cname = category.index[ question.bunrui ];
+	ctx.querySelector('div[data-title]').textContent = `${q.exam.seireki}(${q.exam.warekiKanji}${q.exam.wareki})年 ${q.exam.season.kanji} 問${q.number} (${cname})`;
+
+	// 問題文を挿入
+	ctx.querySelector('div[data-mondai]').innerHTML = question.mondai;
+
+	// 解答群画像があれば挿入
+	if (question.kaitou) {
+		ctx.querySelector('div[data-kaitou]').innerHTML = question.kaitou;
+	}
+
+	// レイアウトを選択して選択肢を挿入
+	const layout = question.sentaku ? 1 : 2;
+	const layoutctx = ctx.querySelector(`table[data-layout="${layout}"]`);
+	for (let tgt of layoutctx.querySelectorAll('div[data-option]')) {
+		const span = document.createElement('span');
+		span.innerHTML = question.sentaku[ parseInt(tgt.dataset.option) ];
+		tgt.appendChild(span);
+	}
+	layoutctx.dataset.layoutOn = true;
+
+	// 画像の読み込み
+	for (const img of ctx.querySelectorAll('img[data-image-index]')) {
+		const n = img.dataset.imageIndex;
+		img.src = `/data/images/${qid}-${n}.gif`;
+	}
+
+	// 出題履歴
+	if (duplicate[qid]) {
+		const histlist = ctx.querySelector('ul[data-history]');
+		for (const dupid of duplicate[qid]) {
+			const li = document.createElement('li');
+			const q = parseQid(dupid);
+			li.textContent = `${q.exam.seireki}(${q.exam.warekiKanji}${q.exam.wareki})年 ${q.exam.season.kanji} 問${q.number}`
+			histlist.appendChild(li);
+		}
+	}
+
+
+	// 解答済みの場合
+	const answer = user.transaction.data[n].answer;
+	const correct = question.answer;
+	if (answer !== null) {
+		layoutctx.querySelector(`button[data-value="${answer}"]`).dataset.answer = true;
+		layoutctx.querySelector(`button[data-value="${correct}"]`).dataset.correct = true;
+	
+		ctx.querySelector('div[data-result]').dataset.answered = true;
+		ctx.querySelector('div[data-result] span').dataset.correct = answer == correct;
+		ctx.querySelector('a').href = qid2url(question.id) + '#kaisetsu';
+	} else if (user.transaction.mode == 'exam' && user.transaction.inprogress == false) {
+		layoutctx.querySelector(`button[data-value="${correct}"]`).dataset.answer = true;
+		ctx.querySelector('div[data-result]').dataset.answered = true;
+		ctx.querySelector('div[data-result] span').dataset.correct = null;
+		ctx.querySelector('a').href = qid2url(question.id) + '#kaisetsu';
+	}
+}
+
+function eventTransactionQuestionSelected(e)
+{
+	let tgt = e.target;
+
+	// Todo:
+	// 何でか子要素も発火するので親までたどる、解消方法あったはず
+	while (!tgt.dataset.question) {
+		tgt = tgt.parentNode;
+	}
+
+	location.hash = `#${user.transaction.mode}:${tgt.dataset.question}`;
+}
+
+function createTransaction(mode, data, callback)
+{
+	user.transaction = {
+		mode: mode,
+		data: data,
+		start: Date.now(),
+		cursor: 0
+	};
+
+	saveTransaction(callback);
+}
+
+function saveTransaction(callback)
+{
+	user.transaction.lastmodified = Date.now();
+
+	const opt = {
+		method: 'PUT',
+		headers: { 'Content-Type': 'application/json' },
+		body: JSON.stringify(user.transaction)
+	};
+
+	fetch('/user/transaction.json', opt).then( r => {
+		// 200 OK, 201 Created, 204 No Content
+		if ([200,201,204].includes(r.status)) {
+			callback();
+		} else {
+			alert("トランザクションデータの保存に失敗しました。");
+		}
+	});
+}
+
+function terminateTransaction()
+{
+	for (const item of user.transaction.data) {
+		if (item.answer === null || item.correct === null) {
+			continue;
+		}
+
+		let dup = [item.qid];
+		if (duplicate[item.qid]) {
+			dup = dup.concat(duplicate[item.qid]);
+		}
+
+		for (const qid of dup) {
+			const q = parseQid(qid);
+
+			// データにないさらに過去の問題を参照している場合がある
+			// ratioには反映できないのでスキップ
+			if (String(q.exam.id) in user.ratio && q.number <= 25) {
+				if (item.answer == item.correct) {
+					user.ratio[String(q.exam.id)][q.number-1][0]++;
+				}
+				user.ratio[String(q.exam.id)][q.number-1][1]++;
+			}
+		}
+	}
+
+	// update ratio.json
+	const optp = {
+		method: 'PUT',
+		headers: { 'Content-Type': 'application/json' },
+		body: JSON.stringify(user.ratio)
+	};
+
+	fetch('/user/ratio.json', optp).then( r => {
+		// 200 OK, 201 Created, 204 No Content
+		if ([200,201,204].includes(r.status)) {
+			// callback();
+		} else {
+			alert("成績データの保存に失敗しました。");
+		}
+	});
+
+	// delete transaction.json
+	const optd = {
+		method: 'DELETE'
+	};
+
+	fetch('/user/transaction.json', optd).then( r => {
+		// 200 OK, 202 Accept, 204 No Content
+		if ([200,202,204].includes(r.status)) {
+			location.replace('#');
+		} else {
+			alert("トランザクジョンの終了に失敗しました。");
+		}
+	});
+
+	user.transaction = { mode: null };
+
+	updateControlRatio();
+	updateCatalogRatio();
+	updateCatalog();
+}
+
+
+/*
+		exam
+*/
+
+function eventExamLoad(e)
+{
+	if (user.transaction && user.transaction.mode !== null) {
+		alert('別のドリルまたは模擬試験が実行中です。\nExitで終了後に模擬試験を登録できます。');
+		return;
+	}
+
+	const json = JSON.parse(reader.result);
+	const tmp = { mode: 'exam' };
+
+	tmp.title = json.title && json.title.length > 0 ? json.title : '模擬試験';
+	tmp.description = json.description && json.description.length > 0 ? json.description : '';
+	tmp.time = json.time && Number.isInteger(parseInt(json.time)) ? parseInt(json.time) : 0;
+	tmp.data = [];
+
+	const shuffle = json.shuffle ? Boolean(json.shuffle) : false;
+	const qidmax = parseInt(Math.max(...Object.keys(catalog))) * 100 + 25;
+	const qidmin = parseInt(Math.min(...Object.keys(catalog))) * 100 + 1;
+	let invalid = false;
+
+	if (json.data && Array.isArray(json.data)) {
+		for (const eqid of json.data) {
+			if (!Number.isInteger(parseInt(eqid))) {
+				invalid = true;
+				break;
+			}
+
+			const qid = parseInt(eqid);
+			if (qid < qidmin || qidmax > qidmax) {
+				invalid = true;
+				break;
+			}
+
+			const item = {qid: qid, answer: null, correct: null, mark: false};
+			if (shuffle) {
+				item.order = Math.random() * 100;
+			}
+
+			tmp.data.push(item);
+		}
+	} else {
+		invalid = true;
+	}
+
+	if (invalid) {
+		alert('不正な模擬試験データです。\n出題者に連絡してください。');
+		return;
+	}
+
+	if (shuffle) {
+		tmp.data.sort( (a,b) => { return a.order - b.order } );
+	}
+
+	exam = tmp;
+	enterExamTransaction();
+	switchSection('enter-transaction');
+}
+
+function enterExamTransaction()
+{
+	const desc = document.querySelector('#enter-transaction > div[data-description]');
+
+	const newRow = (title, callback) => {
+		const div = document.createElement('div');
+		const span1 = document.createElement('span');
+		span1.textContent = title;
+		const span2 = document.createElement('span');
+		span2.textContent = callback();
+		div.appendChild(span1);
+		div.appendChild(span2);
+		return div;
+	};
+
+	desc.appendChild(newRow('模擬試験', () => { return exam.title }));
+	desc.appendChild(newRow('試験概要', () => { return exam.description }));
+	desc.appendChild(newRow('試験時間', () => { return exam.time + " 分" }));
+	desc.appendChild(newRow('問題数', () => { return exam.data.length + " 問" }));
+
+	document.querySelector('#enter-transaction > button').addEventListener('click', eventExamStart);
+}
+
+function eventExamStart(e)
+{
+	user.transaction = exam;
+	user.transaction.start = Date.now();
+	user.transaction.cursor = 0;
+	user.transaction.inprogress = true;
+	exam = null;
+
+	timer = window.setInterval(eventTimerTick, 1000);
+
+	saveTransaction(() => { location.hash = '#exam:0' });
+}
+
+function eventTimerTick(e)
+{
+	elapsedTime();
+}
+
+function elapsedTime()
+{
+	const start = user.transaction.start;
+	const end = user.transaction.inprogress ? Date.now() : user.transaction.finish;
+	const elapsed = Math.floor((end - start) / 1000);
+
+	const h = Math.floor(elapsed / 3600);
+	const m = Math.floor(elapsed % 3600 / 60);
+	const s = Math.floor(elapsed %  60);
+
+	const clock = h + ':' + ('00' + m).slice(-2) + ':' + ('00' + s).slice(-2);
+	document.querySelector('header span[data-icon="time"]').dataset.label = clock;
+}
 
 </script>
 </head>
