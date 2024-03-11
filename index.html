@@ -1884,6 +1884,64 @@ function elapsedTime()
 	document.querySelector('header span[data-icon="time"]').dataset.label = clock;
 }
 
+
+/*
+		common
+*/
+
+function qid2url(qid)
+{
+	const q = parseQid(qid);
+	const wa = ('00' + q.exam.wareki).slice(-2);
+
+	return `https://www.sc-siken.com/kakomon/${wa}_${q.exam.season.roma}/am2_${q.number}.html`;
+}
+
+function parseQid(qid)
+{
+	return {
+		id: qid,
+		number: qid % 100,
+		exam: parseEid(Math.floor(qid / 100))
+	};
+}
+
+function parseEid(eid)
+{
+	const season_conv_roma = [ 'toku', 'haru', 'aki' ];
+	const season_conv_kanji = [ '特別', '春期', '秋期' ];
+
+	const e = {
+		id: eid,
+		season: {
+			id: eid % 10,
+			roma: season_conv_roma[0], // toku
+			kanji: season_conv_kanji[0] // 特別
+		},
+		seireki: Math.floor(eid / 10),
+		wareki: Math.floor(eid / 10) - 1988, // 平成
+		warekiKanji: '平成'
+	};
+
+	if (eid >= 20192) {
+		e.wareki = e.seireki - 2018;
+		e.warekiKanji = '令和';
+	}
+
+	if (eid != 20111) {
+		e.season.roma = season_conv_roma[e.season.id];
+		e.season.kanji = season_conv_kanji[e.season.id];
+	}
+
+	return e;
+}
+
+function randomString(len)
+{
+	const s = 'abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789!"#$%&()-=^~\|@`[{;+:*]},<.>/?_';
+	return Array.from(crypto.getRandomValues(new Uint8Array(len))).map((n)=>s[n%s.length]).join('');
+}
+
 </script>
 </head>
 <body>
@@ -2019,6 +2077,5 @@ function elapsedTime()
 </section>
 
 </main>
-
 </body>
 </html>
