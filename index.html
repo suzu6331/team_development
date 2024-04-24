@@ -2,35 +2,22 @@
 <html lang="ja">
 <head>
 <meta charset="utf-8">
-<title>SC AM2</title>
+<title>SC AM2 Drill</title>
 <style>
-/*
-	layout
-
-	body
-		header
-		main
-			#create
-			#index
-				#control
-				#catalog
-			#question
-			#transaction
-
-https://kudakurage.com/ligature_symbols/
-*/
-
-
-@font-face {
-	font-family: 'LigatureSymbols'; /* フォントファミリーの定義 */
-	src: url('LigatureSymbols-2.11.woff') format('woff'); /* フォントファイルの指定 */
-	font-weight: normal; /* フォントの太さ */
-	font-style: normal; /* フォントスタイル */
+* {
+	--version: "20240304";
+	--title: "SC AM2 Drill";
 }
 
-/* リガチャシンボルフォントの利用設定 */
+@font-face {
+	font-family: 'LigatureSymbols';
+	src: url('LigatureSymbols-2.11.woff') format('woff');
+	font-weight: normal;
+	font-style: normal;
+}
+
 .lsf, .lsf-icon::before {
-	font-family: 'LigatureSymbols'; 
+	font-family: 'LigatureSymbols';
 	-webkit-text-rendering: optimizeLegibility;
 	-moz-text-rendering: optimizeLegibility;
 	-ms-text-rendering: optimizeLegibility;
@@ -43,72 +30,47 @@ https://kudakurage.com/ligature_symbols/
 	font-smoothing: antialiased;
 }
 
-/* アイコン用クラス設定 */
 .lsf-icon::before {
-	content:attr(data-icon); 
+	content:attr(data-icon);
 	margin-right:0.3em;
-	font-size:130%; 
+	font-size:130%;
 	letter-spacing: 0px;
 }
 
-/* body要素のスタイリング */
 body {
 	margin: 0px;
-	padding: 0px; 
-	background-color: #fff; 
+	padding: 0px;
+	background-color: #fff;
 }
 
-/* header要素のスタイリング */
 header {
-	color: #fff; 
+	color: #fff;
 	background-color: #444;
-	margin: 0em; 
-	padding-top: 0.25em; 
-	position: sticky; 
-	top: 0px; 
-	opacity: 95%; 
+	margin: 0em;
+	padding-top: 0.25em;
+	position: sticky;
+	top: 0px;
+	opacity: 95%;
 }
-/* ドリルモード時のヘッダースタイル */
-header[data-mode="drill"] {
-	background-color: #484;
-}
-/* 試験モード時のヘッダースタイル */
-header[data-mode="exam"] {
-	background-color: #c44;
-}
-
-/* ヘッダーの初期テキストスタイリング */
 header::before {
 	display: inline-block;
-	font-size: 1.2em; 
+	font-size: 1.2em;
 	font-weight: bold;
-	content: "SC AM2 Drill";
+	content: var(--title);
 	margin-left: 0.25em;
 	padding: 0.125em;
 }
-/* モード切替スパン要素の表示制御 */
-header > span[data-mode] {
-	display: none; /* デフォルトで非表示 */
-}
-/* アクティブモードのスパン要素を表示 */
-header[data-mode="null"] > span[data-mode="null"],
-header[data-mode="drill"] > span[data-mode="drill"],
-header[data-mode="exam"] > span[data-mode="exam"] {
-	display: inline-block; 
-}
-/* コマンドスパン要素のスタイリング */
 header span[data-cmd] {
-	display: inline-block; 
-	font-size: 1em; 
-	margin-left: 0.25em; 
+	display: inline-block;
+	font-size: 1em;
+	margin-left: 0.25em;
 	margin-bottom: 0.2em;
-	padding: 0.1em 1em; 
-	color: #fff; 
-	vertical-align: middle; 
+	padding: 0.1em 1em;
+	color: #fff;
+	vertical-align: middle;
 	border-radius: 5px;
-	cursor: pointer; 
+	cursor: pointer;
 }
-
 header span[data-cmd]:hover {
 	background-color: #fff;
 	color: #333;
@@ -116,20 +78,6 @@ header span[data-cmd]:hover {
 header span[data-label]::after {
 	content: attr(data-label);
 }
-header[data-section="transaction"] > span[data-mode] > span:not([data-required]) {
-	display: none !important;
-}
-/* 模擬試験中の問題ページには終了ボタンは表示しない */
-header[data-section="question"] > span[data-mode="exam"] > span[data-required] {
-	display: none !important;
-}
-header:not([data-in-progress="true"]) > span[data-mode="exam"] > span[data-state="inprogress"] {
-	display: none !important;
-}
-header:not([data-in-progress="false"]) > span[data-mode="exam"] > span[data-state="finished"] {
-	display: none !important;
-}
-
 header > span[data-profile-name]::after {
 	display: inline-block;
 	float: right;
@@ -140,11 +88,62 @@ header > span[data-profile-name]::after {
 	font-size: 1.2em;
 	font-weight: bold;
 }
+header > span[data-version]::after {
+	display: inline-block;
+	float: right;
+	width: 6em;
+	overflow-wrap: break-word;
+	content: "Version " var(--version);
+	margin-right: 0.25em;
+	padding: 0.125em;
+	font-size: 0.8em;
+	text-align: right;
+	line-height: 1.1em;
+}
+/* Normal/Drill/Examの状態に応じて表示するメニューを変える */
+header > span[data-mode] {
+	display: none;
+}
+body[data-mode="null"] > header > span[data-mode="null"],
+body[data-mode="drill"] > header > span[data-mode="drill"],
+body[data-mode="exam"] > header > span[data-mode="exam"] {
+	display: inline-block;
+}
+body[data-mode="drill"] > header {
+	background-color: #484;
+}
+body[data-mode="exam"] > header {
+	background-color: #c44;
+}
+/*
+	drill: 一覧画面中の前・次・マークを表示しない
+	exam: 一覧画面中の前・次・マークを表示しない
+	exam: 問題画面中の終了(Finish/Exit)を表示しない
+*/
+body[data-section="transaction"][data-mode="drill"] > header > span[data-mode="drill"] > span:not([data-required]),
+body[data-section="transaction"][data-mode="exam"] > header > span[data-mode="exam"] > span[data-mode="question"],
+body[data-section="question"][data-mode="exam"] > header > span[data-mode="exam"] > span[data-mode="transaction"] {
+	display: none;
+}
+/*
+	exam: 進行中: 一覧画面中のExitを表示しない
+	exam: 終了後: 一覧画面中のFinishを表示しない
+*/
+body[data-section="transaction"][data-mode="exam"][data-in-progress="true"] > header > span[data-mode="exam"] > span[data-mode="transaction"] > span:not([data-state="inprogress"]),
+body[data-section="transaction"][data-mode="exam"][data-in-progress="false"] > header > span[data-mode="exam"] > span[data-mode="transaction"] > span:not([data-state="finished"]) {
+	display: none;
+}
 
-main { margin: 0.5em }
+main {
+	margin: 0.5em;
+}
 
-section { display: none; }
-section[data-current] { display: block; }
+section {
+	display: none;
+}
+section[data-current] {
+display: block;
+}
 section[data-current][data-display="true"] {
 	opacity: 1;
 	animation: fadein 0.1s;
@@ -161,15 +160,11 @@ section[data-current][data-display="false"] {
 	from { opacity: 0; }
 	to { opacity: 1; }
 }
-
 /* Index */
-
 #index span.hint {
 	color: #666;
 }
-
 /* control */
-
 #control > div {
 	margin: 0;
 	padding: 0;
@@ -216,7 +211,6 @@ section[data-current][data-display="false"] {
 	content: attr(data-selected);
 	color: #333;
 }
-
 /* catalog */
 #catalog {
 	--color-head-fg: #fff;
@@ -252,15 +246,30 @@ section[data-current][data-display="false"] {
 	width: 8em;
 	text-align: right;
 }
-#catalog > div:not(:first-child) > span:first-child {background-color: var(--color-type4);}
-#catalog > div[data-dup='1'] > span:first-child {background-color: var(--color-type1);}
-#catalog > div[data-dup='2'] > span:first-child {background-color: var(--color-type2);}
-#catalog > div[data-dup='1'] > span {border-color: var(--color-type1);}
-#catalog > div[data-dup='2'] > span {border-color: var(--color-type2);}
-#catalog > div > span[data-dup='1'] {background-color: var(--color-type1);}
-#catalog > div > span[data-dup='2'] {background-color: var(--color-type2);}
-#catalog > div > span[data-dup='3'] {background-color: var(--color-type3);}
-
+#catalog > div:not(:first-child) > span:first-child {
+	background-color: var(--color-type4);
+}
+#catalog > div[data-dup='1'] > span:first-child {
+	background-color: var(--color-type1);
+}
+#catalog > div[data-dup='2'] > span:first-child {
+	background-color: var(--color-type2);
+}
+#catalog > div[data-dup='1'] > span {
+	border-color: var(--color-type1);
+}
+#catalog > div[data-dup='2'] > span {
+	border-color: var(--color-type2);
+}
+#catalog > div > span[data-dup='1'] {
+	background-color: var(--color-type1);
+}
+#catalog > div > span[data-dup='2'] {
+	background-color: var(--color-type2);
+}
+#catalog > div > span[data-dup='3'] {
+	background-color: var(--color-type3);
+}
 #catalog > div:not(:first-child) > span:not([data-dup]):hover {
 	border-color: var(--color-head-bg);
 	cursor: pointer;
@@ -269,8 +278,12 @@ section[data-current][data-display="false"] {
 	content: attr(data-ratio);
 	font-size: 0.8em;
 }
-#catalog > div:not(:first-child) > span:not(:first-child):not([data-ratio])::before {content: "-";}
-#catalog > div > span[data-masked='true'] {visibility: hidden;}
+#catalog > div:not(:first-child) > span:not(:first-child):not([data-ratio])::before {
+	content: "-";
+}
+#catalog > div > span[data-masked='true'] {
+	visibility: hidden;
+}
 #catalog span[data-em] {
 	opacity: 1;
 	animation: fadein 0.5s;
@@ -278,7 +291,6 @@ section[data-current][data-display="false"] {
 	background-color: #666 !important;
 	color: #fff !important;
 }
-
 /* Question */
 #question > div:first-child {
 	width: 920px;
@@ -290,7 +302,6 @@ section[data-current][data-display="false"] {
 	font-size: 0.9em;
 	line-height: 1.8em;
 }
-
 #question div[data-number] {
 	font-size: large;
 	color: #226;
@@ -308,16 +319,13 @@ section[data-current][data-display="false"] {
 	letter-spacing: 0em;
 	content: "✔ Marked";
 }
-
 #question div[data-title] {
 	text-align: right;
 	color: #888;
 }
-
 #question div[data-mondai] {
 	padding: 1em 0.5em;
 }
-
 #question div[data-answer] {
 	position: relative;
 	background: #eef;
@@ -329,27 +337,22 @@ section[data-current][data-display="false"] {
 	margin-left: 1em;
 	font-size: 105%;
 }
-
 #question .code,
 #question .pre {
 	font-family: Consolas, monospace;
 	letter-spacing: 0;
 }
-
 #question .img_margin {
 	margin: 1em auto !important;
 	text-align: center;
 }
-
 #question img {
 	border: 0;
 	vertical-align: middle;
 }
-
 #question div[data-kaitou] img {
 	margin: 0.5em;
 }
-
 #question table[data-layout] {
 	display: none;
 }
@@ -376,7 +379,6 @@ section[data-current][data-display="false"] {
 #question > div:not([data-in-progress]) table[data-layout-on] button[data-correct] {
 	background-color: #aaf !important;
 }
-
 #question table[data-layout] tr[data-erase] {
 	opacity: 0.3;
 	text-decoration: line-through;
@@ -394,7 +396,6 @@ section[data-current][data-display="false"] {
 #question table[data-layout] img {
 	vertical-align: top;
 }
-
 #question div[data-result] {
 	display: none;
 	background: #eee;
@@ -444,10 +445,13 @@ section[data-current][data-display="false"] {
 #question > div[data-in-progress] ul[data-history] {
 	visibility: hidden !important;
 }
-
 /* Transaction */
-#transaction div[data-description] {margin: 0.5em;}
-#transaction div[data-list] {width: max-content;}
+#transaction div[data-description] {
+	margin: 0.5em;
+}
+#transaction div[data-list] {
+	width: max-content;
+}
 #transaction div[data-list] span {
 	display: inline-block;
 	box-sizing: border-box;
@@ -461,12 +465,16 @@ section[data-current][data-display="false"] {
 	color: #fff;
 	text-align: center !important;
 }
-#transaction div[data-list] div[data-question]:nth-child(odd) {background-color: #eef;}
+#transaction div[data-list] div[data-question]:nth-child(odd) {
+	background-color: #eef;
+}
 #transaction div[data-list] div[data-question]:hover {
 	background-color: #eee;
 	cursor: pointer;
 }
-#transaction div[data-list] span:nth-child(-n + 3) {width: 5em;}
+#transaction div[data-list] span:nth-child(-n + 3) {
+	width: 5em;
+}
 #transaction div[data-list] span:nth-child(4) {
 	width: 16em;
 	text-align: left;
@@ -475,12 +483,15 @@ section[data-current][data-display="false"] {
 	width: 20em;
 	text-align: left;
 }
-#transaction div[data-list="exam"][data-in-progress="true"] div[data-question]:not(:first-child) span:nth-last-child(-n + 2) {
+body[data-mode="exam"][data-in-progress="true"] #transaction div[data-question]:not(:first-child) span:nth-last-child(-n + 2) {
 	visibility: hidden;
 }
-
-body[data-mode="exam"][data-in-progress="true"] #transaction div[data-result] {display: none;}
-#transaction div[data-result] {margin-top: 1em;}
+body[data-mode="exam"][data-in-progress="true"] #transaction div[data-result] {
+	display: none;
+}
+#transaction div[data-result] {
+	margin-top: 1em;
+}
 #transaction div[data-result] > span {
 	display: inline-block;
 	border: solid 1px #ccc;
@@ -488,22 +499,24 @@ body[data-mode="exam"][data-in-progress="true"] #transaction div[data-result] {d
 	padding: 0.25em;
 	text-align: center;
 }
-#transaction div[data-result] > span:last-child {width: 10em;}
-
-#transaction div[data-result] > span[data-value]::before {content: attr(data-value);}
+#transaction div[data-result] > span:last-child {
+	width: 10em;
+}
+#transaction div[data-result] > span[data-value]::before {
+	content: attr(data-value);
+}
 #transaction div[data-result] > span:nth-child(odd) {
 	border-right: none;
 	background-color: #eee;
 }
-
 /* enter-transaction */
 #enter-transaction > div[data-description] {
 	margin: 0.5em;
 	margin-top: 1em;
 }
-
 #enter-transaction > div[data-description] > div {
 	border: solid 1px #ccc;
+	border-radius: 5px;
 	margin: 0.25em;
 }
 #enter-transaction > div[data-description] > div > span {
@@ -513,7 +526,6 @@ body[data-mode="exam"][data-in-progress="true"] #transaction div[data-result] {d
 	padding: 0.125em;
 	padding-left: 0.5em;
 }
-
 #enter-transaction > div[data-description] > div > span:first-child {
 	width: 10em;
 	background-color: #eee;
@@ -598,7 +610,6 @@ async function initialize()
 	initializeHeader();
 	initializeSectionCreate();
 	initializeSectionIndex();
-	initializeSectionQuestion();
 
 	// 表示
 	switchSection(parseLocation());
@@ -642,17 +653,17 @@ function switchSection(section)
 	document.getElementById(section).dataset.current = true;
 	document.getElementById(section).dataset.display = true;
 
-	tgt = document.querySelector('header');
+	const body = document.querySelector('body');
 	if (user.transaction) {
-		tgt.dataset.mode = user.transaction.mode;
-		tgt.dataset.section = section;
+		body.dataset.mode = user.transaction.mode;
+		body.dataset.section = section;
 		if (user.transaction.mode == 'exam') {
-			tgt.dataset.inProgress = user.transaction.inprogress;
+			body.dataset.inProgress = user.transaction.inprogress;
 		}
 	} else {
-		delete tgt.dataset.mode;
-		delete tgt.dataset.section;
-		delete tgt.dataset.inprogress;
+		delete body.dataset.mode;
+		delete body.dataset.section;
+		delete body.dataset.inprogress;
 	}
 }
 
@@ -1008,6 +1019,10 @@ function eventDrillStart(e)
 
 	data.sort( (a,b) => { return a.order - b.order } );
 
+	for (const item of data) {
+		delete item.order;
+	}
+
 	createTransaction('drill', data, () => { location.hash = '#drill:0' });
 }
 
@@ -1174,6 +1189,7 @@ function updateControlRatio()
 		ttgt[i].parentNode.dataset.count = tcnd[i] + '/' + tcnt[i];
 	}
 }
+
 // 問題一覧表の再表示
 function updateCatalog()
 {
@@ -1198,30 +1214,24 @@ function updateCatalog()
 		section: question
 */
 
-function initializeSectionQuestion()
+function initializeQuestion()
 {
+	const ctx = document.getElementById('question');
+	ctx.textContent = '';
+	ctx.appendChild( document.getElementById('template-question').content.cloneNode(true) );
+
 	for (const tgt of document.querySelectorAll('#question table[data-layout] button')) {
 		tgt.addEventListener('click', eventAnswerSelected);
 	}
 	for (const tgt of document.querySelectorAll('#question table[data-layout="1"] tr')) {
 		tgt.addEventListener('click', eventAnswerToggle);
 	}
+
+	return ctx;
 }
 
-async function loadQuestion(qid)
+function loadQuestionCommon(ctx, q)
 {
-	const req = fetch(`/data/${qid}.json`);
-
-	const ctx = document.getElementById('question');
-	cleanupQuestion(ctx);
-	const q = parseQid(qid);
-
-	await req.then( r => { return r.json() } ).then( json => { question = json } );
-
-
-	// 問題番号
-	ctx.querySelector('div[data-number]').textContent = `問${q.number}`;
-
 	// 試験名
 	const cname = category.index[ question.bunrui ];
 	ctx.querySelector('div[data-title]').textContent = `${q.exam.seireki}(${q.exam.warekiKanji}${q.exam.wareki})年 ${q.exam.season.kanji} 問${q.number} (${cname})`;
@@ -1247,13 +1257,13 @@ async function loadQuestion(qid)
 	// 画像の読み込み
 	for (const img of ctx.querySelectorAll('img[data-image-index]')) {
 		const n = img.dataset.imageIndex;
-		img.src = `/data/images/${qid}-${n}.gif`;
+		img.src = `/data/images/${question.id}-${n}.gif`;
 	}
 
 	// 出題履歴
-	if (duplicate[qid]) {
+	if (duplicate[question.id]) {
 		const histlist = ctx.querySelector('ul[data-history]');
-		for (const dupid of duplicate[qid]) {
+		for (const dupid of duplicate[question.id]) {
 			const li = document.createElement('li');
 			const q = parseQid(dupid);
 			li.textContent = `${q.exam.seireki}(${q.exam.warekiKanji}${q.exam.wareki})年 ${q.exam.season.kanji} 問${q.number}`
@@ -1262,51 +1272,21 @@ async function loadQuestion(qid)
 	}
 }
 
-function cleanupQuestion(ctx)
+async function loadQuestion(qid)
 {
-	delete document.querySelector('#question > div:first-child').dataset.inProgress;
+	const req = fetch(`/data/${qid}.json`);
 
-	ctx.querySelector('div[data-number]').textContent = "";
-	ctx.querySelector('div[data-title]').textContent = "";
-	ctx.querySelector('div[data-mondai]').textContent = "";
-	ctx.querySelector('div[data-kaitou]').textContent = "";
+		const ctx = initializeQuestion();
+		const q = parseQid(qid);
 
-	let tgt = ctx.querySelector('div[data-number]');
-	if (tgt.dataset.mark) {
-		delete tgt.dataset.mark;
-	}
+	await req.then( r => { return r.json() } ).then( json => { question = json } );
 
-	const layout = ctx.querySelector('table[data-layout-on]');
-	if (layout) {
-		delete layout.dataset.layoutOn;
-	}
 
-	for (let tgt of ctx.querySelectorAll('tr[data-erase]')) {
-		delete tgt.dataset.erase;
-	}
+	// 問題番号
+	ctx.querySelector('div[data-number]').textContent = `問${q.number}`;
 
-	for (let tgt of ctx.querySelectorAll('div[data-option]')) {
-		tgt.textContent = "";
-	}
-
-	tgt = ctx.querySelector('button[data-answer]');
-	if (tgt) {
-		delete tgt.dataset.answer;
-	}
-
-	tgt = ctx.querySelector('button[data-correct]');
-	if (tgt) {
-		delete tgt.dataset.correct;
-	}
-
-	const answered = ctx.querySelector('div[data-answered]');
-	if (answered) {
-		delete answered.dataset.answered;
-		delete answered.querySelector('span[data-correct]').dataset.correct;
-		answered.querySelector('a').href = "";
-	}
-
-	ctx.querySelector('ul[data-history]').textContent = '';
+	// 共通
+	loadQuestionCommon(ctx, q);
 }
 
 function eventAnswerSelected(e)
@@ -1381,8 +1361,6 @@ function eventAnswerToggle(e)
 function loadTransaction()
 {
 	const body = document.querySelector('body');
-	body.dataset.mode = user.transaction.mode;
-	body.dataset.inProgress = user.transaction.inprogress;
 
 	const ctx = document.getElementById('transaction');
 
@@ -1492,9 +1470,9 @@ function parseTransactionCommand(command)
 	const cmd = m[2];
 
 	if (user.transaction.mode == 'exam') {
-		elapsedTime();
+		eventTimeElapsed();
 		if (user.transaction.inprogress && timer == null) {
-			timer = window.setInterval(eventTimerTick, 1000);
+			timer = window.setInterval(eventTimeElapsed, 1000);
 		}
 	}
 
@@ -1576,18 +1554,18 @@ async function loadTransactionQuestion(n)
 
 	const req = fetch(`/data/${qid}.json`);
 
-	const ctx = document.getElementById('question');
-	cleanupQuestion(ctx);
-	const q = parseQid(qid);
+		const ctx = initializeQuestion();
+
+		if (user.transaction.inprogress) {
+			ctx.querySelector('#question > div:first-child').dataset.inProgress = true;
+		} else {
+			delete ctx.querySelector('#question > div:first-child').dataset.inProgress;
+		}
+
+		const q = parseQid(qid);
 
 	await req.then( r => { return r.json() } ).then( json => { question = json } );
 
-	// モード
-	if (user.transaction.inprogress) {
-		ctx.querySelector('#question > div:first-child').dataset.inProgress = true;
-	} else {
-		delete ctx.querySelector('#question > div:first-child').dataset.inProgress;
-	}
 
 	// 正解を転記
 	user.transaction.data[n].correct = question.answer;
@@ -1596,49 +1574,14 @@ async function loadTransactionQuestion(n)
 	const qn = user.transaction.cursor + 1;
 	const nctx = ctx.querySelector('div[data-number]');
 	nctx.textContent = `問${qn}`;
+
+	// マーク
 	if (user.transaction.data[n].mark) {
 		nctx.dataset.mark = true;
 	}
 
-	// 試験名
-	const cname = category.index[ question.bunrui ];
-	ctx.querySelector('div[data-title]').textContent = `${q.exam.seireki}(${q.exam.warekiKanji}${q.exam.wareki})年 ${q.exam.season.kanji} 問${q.number} (${cname})`;
-
-	// 問題文を挿入
-	ctx.querySelector('div[data-mondai]').innerHTML = question.mondai;
-
-	// 解答群画像があれば挿入
-	if (question.kaitou) {
-		ctx.querySelector('div[data-kaitou]').innerHTML = question.kaitou;
-	}
-
-	// レイアウトを選択して選択肢を挿入
-	const layout = question.sentaku ? 1 : 2;
-	const layoutctx = ctx.querySelector(`table[data-layout="${layout}"]`);
-	for (let tgt of layoutctx.querySelectorAll('div[data-option]')) {
-		const span = document.createElement('span');
-		span.innerHTML = question.sentaku[ parseInt(tgt.dataset.option) ];
-		tgt.appendChild(span);
-	}
-	layoutctx.dataset.layoutOn = true;
-
-	// 画像の読み込み
-	for (const img of ctx.querySelectorAll('img[data-image-index]')) {
-		const n = img.dataset.imageIndex;
-		img.src = `/data/images/${qid}-${n}.gif`;
-	}
-
-	// 出題履歴
-	if (duplicate[qid]) {
-		const histlist = ctx.querySelector('ul[data-history]');
-		for (const dupid of duplicate[qid]) {
-			const li = document.createElement('li');
-			const q = parseQid(dupid);
-			li.textContent = `${q.exam.seireki}(${q.exam.warekiKanji}${q.exam.wareki})年 ${q.exam.season.kanji} 問${q.number}`
-			histlist.appendChild(li);
-		}
-	}
-
+	// 共通
+	loadQuestionCommon(ctx, q);
 
 	// 解答済みの場合
 	const answer = user.transaction.data[n].answer;
@@ -1774,7 +1717,7 @@ function terminateTransaction()
 function eventExamLoad(e)
 {
 	if (user.transaction && user.transaction.mode !== null) {
-		alert('別のドリルまたは模擬試験が実行中です。\nExitで終了後に模擬試験を登録できます。');
+		alert('別のドリルまたは模擬試験が実行中です。\nExitで終了後に再度模擬試験を登録してください。');
 		return;
 	}
 
@@ -1824,6 +1767,10 @@ function eventExamLoad(e)
 		tmp.data.sort( (a,b) => { return a.order - b.order } );
 	}
 
+	for (const item of tmp.data) {
+		delete item.order;
+	}
+
 	exam = tmp;
 	enterExamTransaction();
 	switchSection('enter-transaction');
@@ -1832,6 +1779,7 @@ function eventExamLoad(e)
 function enterExamTransaction()
 {
 	const desc = document.querySelector('#enter-transaction > div[data-description]');
+	desc.textContent = '';
 
 	const newRow = (title, callback) => {
 		const div = document.createElement('div');
@@ -1860,17 +1808,12 @@ function eventExamStart(e)
 	user.transaction.inprogress = true;
 	exam = null;
 
-	timer = window.setInterval(eventTimerTick, 1000);
+	timer = window.setInterval(eventTimeElapsed, 1000);
 
 	saveTransaction(() => { location.hash = '#exam:0' });
 }
 
-function eventTimerTick(e)
-{
-	elapsedTime();
-}
-
-function elapsedTime()
+function eventTimeElapsed(e)
 {
 	const start = user.transaction.start;
 	const end = user.transaction.inprogress ? Date.now() : user.transaction.finish;
@@ -1880,10 +1823,12 @@ function elapsedTime()
 	const m = Math.floor(elapsed % 3600 / 60);
 	const s = Math.floor(elapsed %  60);
 
-	const clock = h + ':' + ('00' + m).slice(-2) + ':' + ('00' + s).slice(-2);
+	let clock = h + ':' + ('00' + m).slice(-2) + ':' + ('00' + s).slice(-2);
+	if (user.transaction.time) {
+		clock += ` (試験時間${user.transaction.time}分)`;
+	}
 	document.querySelector('header span[data-icon="time"]').dataset.label = clock;
 }
-
 
 /*
 		common
@@ -1941,7 +1886,6 @@ function randomString(len)
 	const s = 'abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789!"#$%&()-=^~\|@`[{;+:*]},<.>/?_';
 	return Array.from(crypto.getRandomValues(new Uint8Array(len))).map((n)=>s[n%s.length]).join('');
 }
-
 </script>
 </head>
 <body>
@@ -1957,7 +1901,21 @@ function randomString(len)
 		<span class="lsf-icon" data-icon="right" data-cmd="#drill:next" data-label="Next"></span>
 		<span class="lsf-icon" data-icon="check" data-cmd="#drill:mark" data-label="Mark"></span>
 	</span>
+	<span data-mode="exam">
+		<span data-mode="transaction">
+			<span class="lsf-icon" data-icon="logout" data-cmd="#exam:leave" data-label="Finish" data-state="inprogress"></span>
+			<span class="lsf-icon" data-icon="logout" data-cmd="#exam:exit" data-label="Exit" data-state="finished"></span>
+		</span>
+		<span data-mode="question">
+			<span class="lsf-icon" data-icon="list" data-cmd="#exam:" data-label="Index"></span>
+			<span class="lsf-icon" data-icon="left" data-cmd="#exam:prev" data-label="Prev"></span>
+			<span class="lsf-icon" data-icon="right" data-cmd="#exam:next" data-label="Next"></span>
+			<span class="lsf-icon" data-icon="check" data-cmd="#exam:mark" data-label="Mark"></span>
+		</span>
+		<span class="lsf-icon" data-icon="time" data-label=""></span>
+	</span>
 
+	<span data-version></span>
 	<span data-profile-name></span>
 </header>
 
@@ -1965,7 +1923,33 @@ function randomString(len)
 
 <section id="create">
 	<h1>ユーザプロファイルの作成</h1>
-	
+	<div>
+		<select name="symbol">
+		<option></option>
+		<option>CT4A</option>
+		<option>CT4B</option>
+		<option>CT3A</option>
+		<option>CT3B</option>
+		<option>CT2A</option>
+		<option>CT2B</option>
+		<option>CT1A</option>
+		<option>CT1B</option>
+		<option>CS3</option>
+		<option>CS2</option>
+		<option>CS1</option>
+		<option>C2</option>
+		<option>C1</option>
+		<option>AI2</option>
+		<option>AI1</option>
+		<option>CV2</option>
+		<option>CV1</option>
+		<option>CK</option>
+		</select> ※クラスを選択<br>
+		<input type="text" name="name" placeholder="氏名"> ※正式な姓名で<br>
+		<input type="text" name="email" placeholder="メールアドレス"> ※ユーザの識別に使用されます<br>
+		<input type="text" name="secret"> ※サーバ同期に使用されるシークレットです<br>
+		<button>作成</button>
+	</div>
 </section>
 
 <section id="index">
@@ -1984,6 +1968,16 @@ function randomString(len)
 				<label><input type="radio" name="correct" value="80">正答率80%未満</label>
 				<label><input type="radio" name="correct" value="60">正答率60%未満</label>
 				<label><input type="radio" name="correct" value="40">正答率40%未満</label>
+			</span>
+		</div>
+		<div>
+			<span>着手回数</span>
+			<span>
+				<label><input type="radio" name="count" value="10000" checked>すべて</label>
+				<label><input type="radio" name="count" value="10">10回未満</label>
+				<label><input type="radio" name="count" value="5">5回未満</label>
+				<label><input type="radio" name="count" value="3">3回未満</label>
+				<label><input type="radio" name="count" value="1">未着手</label>
 			</span>
 		</div>
 		<div>
@@ -2011,8 +2005,33 @@ function randomString(len)
 	</div>
 </section>
 
-
 <section id="question">
+</section>
+
+<section id="transaction">
+	<div data-title></div>
+	<div data-description></div>
+	<div data-list>
+		<div data-header>
+			<span>問題</span><span>解答</span><span>マーク</span><span>過去問題</span><span>分野</span>
+		</div>
+	</div>
+	<div data-result>
+		<span>正解</span><span data-correct></span>
+		<span>不正解</span><span data-incorrect></span>
+		<span>未解答</span><span data-noanswered></span>
+		<span>成績</span><span data-ratio></span>
+	</div>
+</section>
+
+<section id="enter-transaction">
+	<div data-description></div>
+	<button>開始</button>
+</section>
+
+</main>
+
+<template id="template-question">
 	<div>
 		<div data-title></div>
 		<div data-number></div>
@@ -2050,32 +2069,9 @@ function randomString(len)
 				<a class="lsf-icon" data-icon="external" href="" target="_brank">解説 (sc-siken.com)</a>
 			</span>
 		</div>
-
 		<ul data-history></ul>
 	</div>
-</section>
+</template>
 
-<section id="transaction">
-	<div data-title></div>
-	<div data-description></div>
-	<div data-list>
-		<div data-header>
-			<span>問題</span><span>解答</span><span>マーク</span><span>過去問題</span><span>分野</span>
-		</div>
-	</div>
-	<div data-result>
-		<span>正解</span><span data-correct></span>
-		<span>不正解</span><span data-incorrect></span>
-		<span>未解答</span><span data-noanswered></span>
-		<span>成績</span><span data-ratio></span>
-	</div>
-</section>
-
-<section id="enter-transaction">
-	<div data-description></div>
-	<button>開始</button>
-</section>
-
-</main>
 </body>
 </html>
